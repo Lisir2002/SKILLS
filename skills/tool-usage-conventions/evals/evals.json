@@ -1,0 +1,41 @@
+{
+  "skill_name": "tool-usage-conventions",
+  "trigger_evals": [
+    {
+      "id": "t1_read_file",
+      "prompt": "帮我读一下 src/Main.kt 这个文件",
+      "must_trigger": true,
+      "keywords": ["文件操作", "文件", "readfile"]
+    },
+    {
+      "id": "t2_build_apk",
+      "prompt": "帮我打包一个Android APK",
+      "must_trigger": true,
+      "keywords": ["构建打包", "android", "apk"]
+    },
+    {
+      "id": "t3_terminal_command",
+      "prompt": "帮我在终端里跑一下构建命令",
+      "must_trigger": true,
+      "keywords": ["命令", "构建", "terminal"]
+    },
+    {
+      "id": "t4_negative_media",
+      "prompt": "解析一下这个抖音视频链接",
+      "must_trigger": false,
+      "keywords": ["文件操作", "构建打包", "android", "apk"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_busybox", "kind": "contains", "target": "SKILL.md", "text": "BusyBox" },
+    { "id": "q3_readme_install", "kind": "contains", "target": "README.md", "text": "安装" },
+    { "id": "q4_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_busybox_lint",
+      "command": ["python3", "scripts/busybox_lint.py", "--cmd", "echo hi"]
+    }
+  ]
+}

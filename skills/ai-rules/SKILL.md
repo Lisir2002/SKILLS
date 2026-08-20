@@ -1,6 +1,6 @@
 ---
 name: "ai-rules"
-description: "Governs how the AI works by enforcing a layered constitution of work rules: root safety lines, general rules (think-before-act, simplicity, surgical changes, goal-driven, evidence loop), and task-specific rulebooks. Generates custom rulebooks from user requests, self-confirms each rule, checks compliance with evidence, and evolves rules via retro learning. Use whenever the user says 定规矩, 按规矩来, 规范AI做事, 做事规矩, 行为准则, 给AI立规矩, 约束一下, 按规矩办事, or asks to set/recall rules or behavior guidelines for how the AI should work. Not for one-off task instructions or tool-specific usage."
+description: "Use whenever the user says 定规矩, 按规矩来, 规范AI做事, 做事规矩, 行为准则, 给AI立规矩, 约束一下, 按规矩办事, or asks to set/recall work rules or behavior guidelines for the AI. Governs AI behavior via a layered constitution: root safety lines, general rules (think-before-act, simplicity, surgical changes, goal-driven, evidence loop), and task-specific rulebooks; generates custom rulebooks, self-confirms each rule, checks compliance with evidence, evolves rules via retro learning. Not for one-off task instructions or tool-specific usage."
 ---
 
 # AI Rules（规范 AI 做事的规矩）

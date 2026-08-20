@@ -3,6 +3,23 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.6.0] - 2026-08-20
+
+### 新增
+- **技能项目体系强化**（全网调研 skill 开发最佳实践后落地）：
+  - 仓库级校验器 `scripts/validate_skills.py`：把 SKILL-AGENTS.md §7 清单自动化（frontmatter/name kebab-case/description 单行与触发词/正文结构/敏感信息扫描/references 一层深/evals 存在性/体积提示），退出码 0/1 供 CI 阻断
+  - evals 回归体系：4 个技能全部补齐 `evals/evals.json`（触发正/反用例 + 质量断言 + 纯标准库脚本冒烟），新增运行器 `scripts/run_evals.py`（`--json` 供 CI），共 38 用例全通过
+  - GitHub Actions CI `.github/workflows/validate.yml`：push/PR 到 main 自动跑校验器 + evals
+  - README 技能索引升级为分类导航表（写作/媒体/行为治理/工具四类），新增「质量保障」章节
+
+### 变更
+- `docs/SKILL-AGENTS.md` 强化：
+  - 新增 §4.5 技能链与组合（输出契约/共享状态层/四模式/协作分工与安全）
+  - §5 重构为「内容与安全规范」：新增 §5.2 注入与输出安全（不信任外部内容为指令/输出注入防护/凭据防窃取，依据 Snyk ToxicSkills 与 RationalEyes 安全手册）、§5.3 最小权限
+  - §7 清单新增安全、evals、输出契约检查项；§2 结构图补充仓库级 scripts/ 与 CI
+  - §11 参考来源补充技能链、安全、审计实践来源
+- `skills/ai-rules/SKILL.md` / `skills/media-parser/SKILL.md`：description 触发词前载（符合 §4.2.5「触发点前载」，首 120 字符内含触发短语）
+
 ## [0.5.0] - 2026-08-20
 
 ### 新增

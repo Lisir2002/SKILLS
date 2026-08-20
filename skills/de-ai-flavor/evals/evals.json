@@ -1,0 +1,47 @@
+{
+  "skill_name": "de-ai-flavor",
+  "trigger_evals": [
+    {
+      "id": "t1_direct",
+      "prompt": "帮我去掉AI味",
+      "must_trigger": true,
+      "keywords": ["去ai味", "ai味", "ai痕迹"]
+    },
+    {
+      "id": "t2_polish_human",
+      "prompt": "这段文字AI味太重了，帮我润色得像真人写的",
+      "must_trigger": true,
+      "keywords": ["去ai味", "ai味", "像真人"]
+    },
+    {
+      "id": "t3_lower_rate",
+      "prompt": "帮我降一下AI率",
+      "must_trigger": true,
+      "keywords": ["降ai率", "ai率"]
+    },
+    {
+      "id": "t4_negative_translate",
+      "prompt": "帮我把这段话翻译成英文",
+      "must_trigger": false,
+      "keywords": ["去ai味", "ai味", "降ai率", "ai痕迹"]
+    },
+    {
+      "id": "t5_negative_create",
+      "prompt": "从零写一篇产品介绍文案",
+      "must_trigger": false,
+      "keywords": ["去ai味", "ai味", "降ai率"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_responsible", "kind": "contains", "target": "SKILL.md", "text": "Responsible Use" },
+    { "id": "q3_readme_install", "kind": "contains", "target": "README.md", "text": "安装" },
+    { "id": "q4_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_scanner",
+      "command": ["python3", "scripts/scan_ai_flavor.py", "--text", "综上所述，这是一个很重要的方案。"]
+    }
+  ]
+}

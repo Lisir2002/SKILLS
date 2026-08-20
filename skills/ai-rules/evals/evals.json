@@ -1,0 +1,43 @@
+{
+  "skill_name": "ai-rules",
+  "trigger_evals": [
+    {
+      "id": "t1_set_rules",
+      "prompt": "给我定个规矩，做事守点规矩",
+      "must_trigger": true,
+      "keywords": ["定规矩", "按规矩", "规矩"]
+    },
+    {
+      "id": "t2_govern_behavior",
+      "prompt": "规范一下AI做事的规矩",
+      "must_trigger": true,
+      "keywords": ["规范ai做事", "做事规矩", "规矩"]
+    },
+    {
+      "id": "t3_behavior_code",
+      "prompt": "给AI立个行为准则",
+      "must_trigger": true,
+      "keywords": ["行为准则", "立规矩"]
+    },
+    {
+      "id": "t4_negative_organize",
+      "prompt": "帮我把这些文件按类型整理归档",
+      "must_trigger": false,
+      "keywords": ["定规矩", "按规矩来", "行为准则", "做事规矩", "约束一下"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_root_lines", "kind": "contains", "target": "SKILL.md", "text": "R1" },
+    { "id": "q3_general_rules", "kind": "contains", "target": "SKILL.md", "text": "G1" },
+    { "id": "q4_reason_based", "kind": "contains", "target": "SKILL.md", "text": "为什么" },
+    { "id": "q5_readme_install", "kind": "contains", "target": "README.md", "text": "安装" },
+    { "id": "q6_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_generator",
+      "command": ["python3", "scripts/generate_rules.py", "--domain", "writing", "--json-out", "/tmp/ai_rules_evals.json"]
+    }
+  ]
+}

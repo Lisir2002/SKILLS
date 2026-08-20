@@ -1,0 +1,35 @@
+{
+  "skill_name": "media-parser",
+  "trigger_evals": [
+    {
+      "id": "t1_douyin",
+      "prompt": "解析一下这个抖音链接 https://v.douyin.com/iABC123/",
+      "must_trigger": true,
+      "keywords": ["抖音", "解析"]
+    },
+    {
+      "id": "t2_bilibili_nowm",
+      "prompt": "帮我下载这个B站视频，去水印 https://www.bilibili.com/video/BV1xx411c7mD",
+      "must_trigger": true,
+      "keywords": ["b站", "去水印", "下载"]
+    },
+    {
+      "id": "t3_share_text",
+      "prompt": "8.88 复制打开抖音，看看这个视频的详细信息",
+      "must_trigger": true,
+      "keywords": ["抖音", "分享文案"]
+    },
+    {
+      "id": "t4_negative_webpage",
+      "prompt": "这个网页帮我总结一下 https://example.com/article/1",
+      "must_trigger": false,
+      "keywords": ["抖音", "快手", "b站", "去水印", "提取视频", "解析"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_platforms", "kind": "contains", "target": "SKILL.md", "text": "20+" },
+    { "id": "q3_readme_install", "kind": "contains", "target": "README.md", "text": "安装" },
+    { "id": "q4_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" }
+  ]
+}

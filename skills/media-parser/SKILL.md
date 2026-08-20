@@ -1,6 +1,6 @@
 ---
 name: "media-parser"
-description: "Parses Douyin/TikTok/Bilibili/Kuaishou/Xiaohongshu/Weibo/YouTube and 20+ short-video share links into structured metadata: no-watermark video, images, cover, title, author, audio. Use when the user sends a 抖音/快手/小红书/B站/微博 link or share text and asks to 解析/去水印/下载/提取视频 or wants the media details. Not for uploading content or operating on non-media links."
+description: "Use when the user sends a 抖音/快手/小红书/B站/微博/YouTube short-video share link or paste 分享文案 and asks to 解析/去水印/下载/提取视频/查看详情. Parses 20+ platforms (Douyin/TikTok/Bilibili/Kuaishou/Xiaohongshu/Weibo/YouTube) into structured metadata: no-watermark video, images, cover, title, author, audio. Not for uploading content or operating on non-media links."
 ---
 
 # Media Parser（多平台媒体解析）
