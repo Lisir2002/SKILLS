@@ -3,6 +3,18 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.5.0] - 2026-08-20
+
+### 新增
+- 第三个技能包 **`ai-rules`（规范 AI 做事的规矩）**：给 AI 一套"做事宪法"体系
+  - 源码 `skills/ai-rules/`，压缩包 `packages/ai-rules.zip`
+  - 三层宪法结构：第 1 层底线（R1 不造假/R2 不越权/R3 不作恶/R4 不越界/R5 不硬撑）+ 第 2 层方法论（G1 先想后做/G2 简单优先/G3 精准改动/G4 目标驱动/G5 证据闭环/G6 边界意识/G7 自省复盘）+ 第 3 层任务专属（按需生成）
+  - 设计借鉴：Karpathy 四诫、OpenAI Model Spec（指挥链）、Anthropic 2026 宪法（reason-based + 四层优先级）、Agent Charters（逐条确认）、SafeHarbor/AGrail（自进化记忆）、Harness 证据闭环
+  - 四脚本（纯标准库离线）：`generate_rules.py` 规矩生成器 / `confirm_rules.py` 逐条确认器 / `check_compliance.py` 合规自检器 / `retro_learn.py` 复盘学习器
+  - `memory/rulebook.json` 跨会话规矩库（基线 R1-R5+G1-G7，复盘可进化、违规计数、去重）
+  - references 五文档：root/general 规则详解（含"为什么"）、六类领域模板、指挥链裁决示例、反合理化表
+  - 全链路实测：生成 17 条规矩、confirm 抓出歧义并修复（🚧 0）、自检三级判定与退出码正确、复盘新增/去重/违规计数正常
+
 ## [0.4.0] - 2026-08-20
 
 ### 新增
