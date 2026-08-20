@@ -18,8 +18,9 @@ Skill 是一种可被 AI 智能体（Trae / Claude 等）加载执行的结构�
 SKILLS/
 ├── README.md                    # 本文档
 ├── docs/
-│   ├── SKILL-AGENTS.md         # 技能设计与打包规范
-│   └── SKILL-TEMPLATE.md        # SKILL.md 推荐模板
+│   ├── SKILL-AGENTS.md          # 技能设计与打包规范
+│   ├── SKILL-TEMPLATE.md        # SKILL.md 推荐模板
+│   └── DOC-WRITING-GUIDE.md     # 各类型文档规范写法
 ├── skills/<skill-name>/         # 技能源码（SKILL.md + README + scripts/ + assets/）
 ├── packages/<skill-name>.zip    # 每个技能一个压缩包
 └── CHANGELOG.md                 # 变更记录
