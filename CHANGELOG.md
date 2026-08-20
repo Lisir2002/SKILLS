@@ -3,6 +3,25 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.4.0] - 2026-08-20
+
+### 新增
+- 第二个技能包 **`media-parser`（多平台媒体解析）**：解析 20+ 平台分享链接 → 无水印视频/图集/封面/标题/作者/音频
+  - 源码 `skills/media-parser/`，基于开源 [media-parser](https://github.com/ucmao/media-parser)（MIT）封装，逻辑本地运行
+  - 支持抖音 `a_bogus` 签名、从整段分享文案提取链接、可选 `--download` 本地下载
+  - 实测优化：抖音 CDN 节点探测（规避 403）、B站返回 CDN 直链（替代本地路径）、微博修复游客登录页劫持
+- 实测验证脚本 `/.validate/`：`mp_validate.py`（解析+URL 可访问性）+ `mp_deep_validate.py`（下载媒体字节校验 MP4/MP3/图片容器结构）+ 自搜真实链接集 `test_links.txt`
+
+### 变更
+- `skills/media-parser/SKILL.md` / `README.md`：按 2026-08 补充测试更新"实测可用性"矩阵（抖音 4/4、快手 4/5、B站 3/4、微博部分、小红书需 Cookie、知乎 403 等如实标注）
+- **失败案例全网借鉴调研**：检索并借鉴 yby6-crawling-short-video-mcp（20+平台）、wwwzhouhui/video-parser、KuaishouParser、vedio2blog 等开源方案，逐项复测失败链接并归因：
+  - 快手 fXqlD6：作品级风控（转发 Cookie 至 `/fw/photo/` 方案同样失败）
+  - 微博 status2：纯转发/文本微博（`page_info` 为空），失败为正确行为
+  - B站 BV1pBXMYeEkU：`view` API 返回 `-404`，视频已删除，非 412 反爬
+  - 西瓜/皮皮虾：旧链接已下架/失效；2026 有效西瓜链接连主流方案也拿不到 `videoInfoRes`
+  - 结论：无脚本可修复缺陷，全部为内容失效/平台限制，已写入 Failure Modes 与可用性矩阵
+- **微视分享域名补全**：原仅支持 `video.weishi.qq.com` / `isee.weishi.qq.com`，补注册微视 APP 默认分享格式 `h5.weishi.qq.com`（302 至 `m.weishi.qq.com/vise/share/`）及其目标域名；现有 `Vise.initState` 解析逻辑完全适配，实测 200 解析成功、视频为有效 MP4（`video/mp4` ftyp 结构）、封面为 JPEG
+
 ## [0.3.0] - 2026-08-20
 
 ### 新增

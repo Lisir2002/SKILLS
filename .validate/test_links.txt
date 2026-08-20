@@ -1,0 +1,16 @@
+# 媒体解析实测链接集（2026-08-20 补充自搜真实链接）
+抖音-短链1|https://v.douyin.com/nvLWFMPTSq0/
+抖音-短链2|https://v.douyin.com/Y5eQdvODPfI/
+抖音-自搜1(听泉赏宝)|https://v.douyin.com/p1G164ZIlXU/
+抖音-自搜2(爱情公寓)|https://v.douyin.com/J4IQiholWbo/
+快手-短链1|https://v.kuaishou.com/fXqlD6
+快手-短链2|https://v.kuaishou.com/K63pZGkI
+快手-短链3|https://v.kuaishou.com/ngwMVqv3
+快手-自搜1(羽绒服)|https://v.kuaishou.com/5hFdnB
+B站-video1|https://www.bilibili.com/video/BV13nKd6ZEsg/
+B站-video2|https://www.bilibili.com/video/BV1XHcLz7EwW/
+B站-自搜1(鬼灭歌曲排名)|https://www.bilibili.com/video/BV1yAEB68E2s/
+B站-自搜2(from the edge)|https://www.bilibili.com/video/BV1pBXMYeEkU/
+小红书-短链1|http://xhslink.com/a/sT7omKb6ijX6
+微博-status1|https://m.weibo.cn/detail/5334109490250213
+微博-status2|https://m.weibo.cn/detail/5321729474035871
