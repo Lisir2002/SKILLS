@@ -50,6 +50,7 @@ SKILLS/
 | 🎬 媒体解析 | [media-parser](skills/media-parser/) | 0.1.0 | 多平台媒体解析：抖音/B站/快手/小红书/微博/YouTube 等 20+ 平台 → 无水印视频/图集/封面/标题/作者 | 已发布 |
 | 🛡️ AI 行为治理 | [ai-rules](skills/ai-rules/) | 0.1.0 | 规范 AI 做事的规矩：三层宪法（底线+方法论+任务专属）+ 生成/确认/合规/复盘四脚本 | 已发布 |
 | 🛠️ 工具与环境 | [tool-usage-conventions](skills/tool-usage-conventions/) | 0.1.0 | 工具使用约定：文件/命令/容器兼容/路径/Android 构建 SOP + BusyBox 兼容自检器 | 已发布 |
+| 📊 数据可视化 | [visualization](skills/visualization/) | 0.1.0 | 可视化：Mermaid 图谱（11 图种）/ 图表选型（Tufte）/ 表格 / HTML 报告 + 三个纯标准库脚本 | 已发布 |
 
 > 每个技能完成、确认、打包后，在此登记，并在 `CHANGELOG.md` 中记录。
 

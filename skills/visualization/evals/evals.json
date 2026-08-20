@@ -1,0 +1,70 @@
+{
+  "skill_name": "visualization",
+  "trigger_evals": [
+    {
+      "id": "t1_direct_diagram",
+      "prompt": "帮我画一个用户登录的流程图",
+      "must_trigger": true,
+      "keywords": ["画图", "流程图", "图"]
+    },
+    {
+      "id": "t2_chart",
+      "prompt": "根据这组数据画一个柱状图",
+      "must_trigger": true,
+      "keywords": ["画图", "柱状图", "图表"]
+    },
+    {
+      "id": "t3_table",
+      "prompt": "把这组数据做成表格",
+      "must_trigger": true,
+      "keywords": ["表格", "表"]
+    },
+    {
+      "id": "t4_report",
+      "prompt": "出一份数据可视化报告",
+      "must_trigger": true,
+      "keywords": ["可视化报告", "报告", "可视化"]
+    },
+    {
+      "id": "t5_mindmap",
+      "prompt": "画个思维导图，梳理一下产品规划",
+      "must_trigger": true,
+      "keywords": ["思维导图", "画图"]
+    },
+    {
+      "id": "t6_negative_photo",
+      "prompt": "帮我把这张照片修一下，去个噪点",
+      "must_trigger": false,
+      "keywords": ["画图", "图表", "表格", "可视化报告"]
+    },
+    {
+      "id": "t7_negative_text",
+      "prompt": "帮我写一段产品介绍文案",
+      "must_trigger": false,
+      "keywords": ["画图", "图表", "表格", "可视化"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_output", "kind": "contains", "target": "SKILL.md", "text": "## Output Spec" },
+    { "id": "q3_readme_install", "kind": "contains", "target": "README.md", "text": "## 安装" },
+    { "id": "q4_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
+    { "id": "q5_ref_mermaid", "kind": "contains", "target": "SKILL.md", "text": "references/mermaid-zh.md" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_advisor",
+      "command": ["python3", "scripts/viz_advisor.py", "把这几个月的销量画成图"]
+    },
+    {
+      "id": "s2_table",
+      "command": ["python3", "scripts/table_builder.py", "--data",
+                  "{\"headers\":[\"区域\",\"销量\"],\"rows\":[[\"华东\",1200],[\"华南\",2300]]}",
+                  "--thousands"]
+    },
+    {
+      "id": "s3_report",
+      "command": ["python3", "scripts/report_builder.py", "examples/report.example.json"]
+    }
+  ]
+}

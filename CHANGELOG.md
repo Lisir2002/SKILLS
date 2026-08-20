@@ -3,6 +3,18 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.7.0] - 2026-08-20
+
+### 新增
+- 第五个技能包 **`visualization`（可视化）**：把"画个图"需求落地为图谱 / 图表 / 表格 / 可视化报告
+  - 源码 `skills/visualization/`，压缩包 `packages/visualization.zip`
+  - 四步工作流：选型（`viz_advisor.py` 判型 + chart-zh 决策树）→ 生成（Mermaid/SVG/表格/报告）→ 校验（语法+数据+设计）→ 输出（图 + 结论句）
+  - 图谱支持 11 种已验证 Mermaid 图种（flowchart/sequenceDiagram/classDiagram/stateDiagram-v2/erDiagram/gantt/pie/xychart-beta/journey/mindmap/timeline），标注 `xychart-beta` 需 Mermaid ≥10.3 并给出降级方案
+  - 图表选型遵循 Tufte 原则（数据墨水比、坐标诚实、颜色语义化、一图一结论），references 三文档：`mermaid-zh.md` / `chart-zh.md` / `svg-zh.md`
+  - 三脚本纯标准库离线：`viz_advisor.py` 类型/子类型顾问（多级关键词打分+置信度）、`table_builder.py` 数据→Markdown/CSV/HTML（自动对齐/千分位/排序）、`report_builder.py` JSON 配置→自包含打印友好 HTML（含 mermaid 渲染与离线降级）
+  - `examples/report.example.json` 报告配置模板；evals 15 用例（触发 7 + 质量 5 + 冒烟 3）全通过
+- 仓库 evals 用例数由 38 增至 53，全部通过；`validate_skills.py` 对 visualization 校验 0 错误 0 警告
+
 ## [0.6.0] - 2026-08-20
 
 ### 新增
