@@ -55,4 +55,4 @@ One line: what problem this skill solves.
 ```
 ```
 
-For the full standard, see [SKILL-DESIGN-STANDARD.md](SKILL-DESIGN-STANDARD.md).
+For the full standard, see [SKILL-AGENTS.md](SKILL-AGENTS.md).

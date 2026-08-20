@@ -2,7 +2,7 @@
 
 本仓库用于维护一套**高质量、可复用、标准化**的 AI 技能（Skill）集合。每一个技能都是一个完整的、符合统一规范的可安装技能包。
 
-> 统一规范见 → [docs/SKILL-DESIGN-STANDARD.md](docs/SKILL-DESIGN-STANDARD.md)
+> 统一规范见 → [docs/SKILL-AGENTS.md](docs/SKILL-AGENTS.md)
 
 ---
 
@@ -18,7 +18,7 @@ Skill 是一种可被 AI 智能体（Trae / Claude 等）加载执行的结构�
 SKILLS/
 ├── README.md                    # 本文档
 ├── docs/
-│   ├── SKILL-DESIGN-STANDARD.md # 技能设计与打包规范
+│   ├── SKILL-AGENTS.md         # 技能设计与打包规范
 │   └── SKILL-TEMPLATE.md        # SKILL.md 推荐模板
 ├── skills/<skill-name>/         # 技能源码（SKILL.md + README + scripts/ + assets/）
 ├── packages/<skill-name>.zip    # 每个技能一个压缩包
