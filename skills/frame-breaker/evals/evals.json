@@ -48,7 +48,13 @@
     { "id": "q7_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
     { "id": "q8_no_secret2", "kind": "not_contains", "target": "SKILL.md", "text": "sk_test_" },
     { "id": "q9_audit_cli", "kind": "contains", "target": "scripts/assumption_audit.py", "text": "--problem" },
-    { "id": "q10_gap_cli", "kind": "contains", "target": "scripts/frame_gap.py", "text": "--original" }
+    { "id": "q10_gap_cli", "kind": "contains", "target": "scripts/frame_gap.py", "text": "--original" },
+    { "id": "q11_engine_layer", "kind": "contains", "target": "SKILL.md", "text": "思维引擎层" },
+    { "id": "q12_cognition_ref", "kind": "contains", "target": "SKILL.md", "text": "cognition-zh.md" },
+    { "id": "q13_blend_ref", "kind": "contains", "target": "SKILL.md", "text": "concept_blend.py" },
+    { "id": "q14_analogy_ref", "kind": "contains", "target": "SKILL.md", "text": "analogy_map.py" },
+    { "id": "q15_blend_cli", "kind": "contains", "target": "scripts/concept_blend.py", "text": "--a" },
+    { "id": "q16_analogy_cli", "kind": "contains", "target": "scripts/analogy_map.py", "text": "--source" }
   ],
   "smoke_tests": [
     {
@@ -66,6 +72,22 @@
     {
       "id": "s4_gap_fake",
       "command": ["python3", "scripts/frame_gap.py", "--original", "如何提升电梯速度", "--reframed", "怎样让电梯跑得更快", "--solution", "优化电机转速", "--json"]
+    },
+    {
+      "id": "s5_blend",
+      "command": ["python3", "scripts/concept_blend.py", "--a", "电梯", "--b", "戏剧", "--json"]
+    },
+    {
+      "id": "s6_analogy",
+      "command": ["python3", "scripts/analogy_map.py", "--source", "气象锋面", "--target", "电梯太慢", "--json"]
+    },
+    {
+      "id": "s7_blend_depth",
+      "command": ["python3", "scripts/concept_blend.py", "--a", "医院", "--b", "游戏", "--depth", "2"]
+    },
+    {
+      "id": "s8_analogy_drama",
+      "command": ["python3", "scripts/analogy_map.py", "--source", "戏剧的悬念", "--target", "电梯等待"]
     }
   ]
 }

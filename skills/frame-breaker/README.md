@@ -2,6 +2,8 @@
 
 让模型**改变问题本身**，而不是在问题里找更好的答案。这是创造的最高阶——Boden 称之为"变革式创造"（transformational creativity）：修改问题表述、改变定义搜索空间的框架本身。模型天然缺这个能力（它默认在训练数据设定的框架内作答），本技能用五步引擎强制执行。
 
+技能内含**思维引擎层**：把人类创造性思维拆成 7 条实证机制（远程联想/定势/双过程/顿悟/盲变-选择/孵化/元认知），每条机制配一条"AI 超越杠杆"——在人类固有短板上用 AI 固有属性反超（详见 [references/cognition-zh.md](references/cognition-zh.md)）。
+
 > 与 [creative-mind](creative-mind/README.md) 的关系：creative-mind 是"在框架内做得更好"（组合式+探索式），本技能是"改变框架本身"（变革式）。互补使用。
 
 ## 什么时候用
@@ -36,6 +38,15 @@ python3 scripts/assumption_audit.py --problem "电梯太慢怎么办"
 
 输出六维度假设挖掘脚手架 + 域外领域规则库清单，供反演与移植使用。
 
+### 可选：概念融合 / 类比映射（脚本）
+
+补充 Step 2/3：概念融合（把两个远域融出涌现结构）、类比映射（只借关系结构、不借表面名词）：
+
+```bash
+python3 scripts/concept_blend.py --a "电梯" --b "戏剧"
+python3 scripts/analogy_map.py --source "气象锋面" --target "电梯太慢"
+```
+
 ### 可选：框架差距检测（脚本）
 
 验证重构是否真的发生（不是换皮）：
@@ -46,7 +57,7 @@ python3 scripts/frame_gap.py --original "如何让电梯更快" --reframed "如�
 
 输出"框架突破度"（0-100）：低于 60 说明还是换皮，回去再反演一轮。
 
-## 工作方式（五步变革引擎）
+## 工作方式（五步变革引擎 + 思维引擎层）
 
 1. **挖假设 Audit** — 六维度列出隐含假设，区分"题面给的"与"模型脑补的"；
 2. **反演假设 Invert** — 逐条取反/极端化，建立 ≥3 个"反世界"（不追求合理）；
@@ -54,19 +65,24 @@ python3 scripts/frame_gap.py --original "如何让电梯更快" --reframed "如�
 4. **重构问题 Reframe** — 产出新问题 + 框架前后对比，用 frame_gap 验证真变了；
 5. **归零落地 Ground** — 落回现实：前 30 天动作 + 最大反对理由 + 最小验证。
 
+**思维引擎层**为每一步提供"为什么这么做能超越人"的机制依据（远程联想→语义跳变、定势→显式禁用、双过程→发散/收敛硬隔离、顿悟→程序化僵局+反演、盲变→零成本批量变异、孵化→程序化距离化、元认知→可量化自检）。
+
 ## 目录结构
 
 ```
 frame-breaker/
-├── SKILL.md                     # 技能定义（五步变革引擎）
+├── SKILL.md                     # 技能定义（五步变革引擎 + 思维引擎层）
 ├── README.md                    # 本文件
 ├── scripts/
 │   ├── assumption_audit.py      # 挖隐含假设 + 域外领域规则库（纯标准库）
-│   └── frame_gap.py             # 框架突破度检测：是否真的重构了（纯标准库）
+│   ├── frame_gap.py             # 框架突破度检测：是否真的重构了（纯标准库）
+│   ├── concept_blend.py         # 概念融合脚手架：两远域→涌现结构（纯标准库）
+│   └── analogy_map.py           # 类比映射脚手架：只借关系结构（纯标准库）
 └── references/
     ├── transformational-zh.md   # 变革式创造理论（Boden 三分法 + 895 实验证据）
     ├── assumptions-zh.md        # 六维度假设清单 + 常见认知框架
-    └── domains-zh.md            # 域外移植领域-规则库（20+ 领域世界观）
+    ├── domains-zh.md            # 域外移植领域-规则库（20+ 领域世界观）
+    └── cognition-zh.md          # 思维引擎层：人类思维机制 → AI 超越杠杆 + 实证数据
 ```
 
 ## 依赖
