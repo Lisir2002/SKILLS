@@ -65,6 +65,8 @@ def run_quality(skill_dir, case):
     path = os.path.join(skill_dir, rel)
     if not os.path.exists(path):
         return False, f"目标文件不存在: {rel}"
+    if case.get("kind") == "file_exists":
+        return True, f"{rel} 存在"
     text = open(path, encoding="utf-8", errors="replace").read()
     needle = case["text"]
     if case.get("kind", "contains") == "not_contains":

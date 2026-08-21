@@ -3,7 +3,8 @@
 """
 report_builder.py — 可视化报告合成器（visualization 技能）
 ============================================================
-把 JSON 配置（标题/章节/文字/表格/Mermaid/SVG/要点）合成为自包含、打印友好的 HTML 报告。
+把 JSON 配置（标题/章节/文字/表格/Mermaid/SVG/图表/要点/看板）合成为
+自包含、打印友好的 HTML 报告。
 
 用法：
     python3 report_builder.py report.json > report.html
@@ -19,13 +20,26 @@ report.json 结构：
     {"type": "mermaid","heading": "架构",   "code": "graph TD; A[用户]-->B[服务]"},
     {"type": "table",  "heading": "对比",   "table": {"headers": ["指标","Q2","Q3"], "rows": [[...]]}},
     {"type": "svg",    "heading": "自绘",   "code": "<svg ...>...</svg>"},
+    {"type": "chart",  "heading": "趋势",   "chart": {"type":"line","data":{...},"title":"销量走势"}},
     {"type": "list",   "heading": "结论",   "items": ["要点一", "要点二"]},
-    {"type": "callout","heading": "注意",   "body": "...", "tone": "warn|info|danger|ok"}
+    {"type": "callout","heading": "注意",   "body": "...", "tone": "warn|info|danger|ok"},
+    {"type": "columns","heading": "关键指标看板",
+     "widths": [1, 1],
+     "cols": [
+       [{"type":"chart","heading":"营收","chart":{...}}],
+       [{"type":"table","heading":"明细","table":{...}}]
+     ]}
   ]
 }
 
+说明：
+- chart 章节：把结构化数据经 svg_chart.py 离线渲染为纯 SVG（柱/线/饼/散点/直方图等），
+  默认 Okabe-Ito 色盲安全配色，零依赖、可离线。
+- columns 章节：把若干子章节排成多列看板（widths 控制列宽比例，缺省等宽），
+  子章节的 heading 自动降为 h3。
+
 Mermaid 渲染需要网络（CDN）；离线时图表以代码块展示，报告其余内容不受影响。
-依赖：仅 Python 标准库。
+依赖：仅 Python 标准库 + 同目录 svg_chart.py。
 """
 
 import argparse
@@ -33,6 +47,10 @@ import html
 import json
 import re
 import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import svg_chart
 
 # ---- 极简 Markdown 加粗/行内代码渲染（够用即可，不引第三方库）----
 def inline_md(s):
@@ -65,40 +83,65 @@ CALL_TONE = {
 }
 
 
+def render_section(sec, level=2):
+    """渲染单个章节。level 控制标题级别（看板内子章节用 3）。"""
+    stype = sec.get("type", "text")
+    heading = sec.get("heading")
+    tag = f"h{level}"
+    parts = []
+    if heading:
+        parts.append(f'<{tag}>{html.escape(heading)}</{tag}>')
+    if stype == "text":
+        body = sec.get("body", "")
+        parts.append('<div class="text">' + "".join(
+            f"<p>{inline_md(b)}</p>" for b in body.split("\n\n") if b.strip()
+        ) + "</div>")
+    elif stype == "list":
+        items = "".join(f"<li>{inline_md(i)}</li>" for i in sec.get("items", []))
+        parts.append(f"<ul>{items}</ul>")
+    elif stype == "table":
+        parts.append(table_to_html(sec.get("table", {})))
+    elif stype == "mermaid":
+        code = sec.get("code", "")
+        parts.append('<pre class="mermaid">' + html.escape(code) + "</pre>")
+    elif stype == "svg":
+        parts.append('<div class="svg-block">' + sec.get("code", "") + "</div>")
+    elif stype == "chart":
+        spec = dict(sec.get("chart", {}) or {})
+        try:
+            svg = svg_chart.render_svg(spec)
+        except Exception as e:
+            parts.append(f'<p class="err">[图表渲染失败：{html.escape(str(e))}]</p>')
+        else:
+            parts.append('<div class="svg-block">' + svg + "</div>")
+    elif stype == "columns":
+        cols = sec.get("cols", [])
+        widths = sec.get("widths")
+        col_html = []
+        for col in cols:
+            inner = "".join(render_section(s, level=3) for s in (col or []))
+            col_html.append(f'<div class="col">{inner}</div>')
+        style = ""
+        if widths and len(widths) == len(col_html):
+            style = f' style="grid-template-columns:{ " ".join(str(w) + "fr" for w in widths) }"'
+        parts.append(f'<div class="cols"{style}>' + "".join(col_html) + "</div>")
+    elif stype == "callout":
+        bg, fg = CALL_TONE.get(sec.get("tone", "info"), CALL_TONE["info"])
+        parts.append(
+            f'<div class="callout" style="background:{bg};border-left:4px solid {fg};color:{fg}">'
+            f"{inline_md(sec.get('body', ''))}</div>"
+        )
+    else:
+        parts.append(f'<p>[未知章节类型：{html.escape(stype)}]</p>')
+    return "".join(parts)
+
+
 def build_report(data):
     title = data.get("title", "可视化报告")
     subtitle = data.get("subtitle", "")
     date = data.get("date", "")
 
-    parts = []
-    for sec in data.get("sections", []):
-        stype = sec.get("type", "text")
-        heading = sec.get("heading")
-        if heading:
-            parts.append(f'<h2>{html.escape(heading)}</h2>')
-        if stype == "text":
-            body = sec.get("body", "")
-            parts.append('<div class="text">' + "".join(
-                f"<p>{inline_md(b)}</p>" for b in body.split("\n\n") if b.strip()
-            ) + "</div>")
-        elif stype == "list":
-            items = "".join(f"<li>{inline_md(i)}</li>" for i in sec.get("items", []))
-            parts.append(f"<ul>{items}</ul>")
-        elif stype == "table":
-            parts.append(table_to_html(sec.get("table", {})))
-        elif stype == "mermaid":
-            code = sec.get("code", "")
-            parts.append('<pre class="mermaid">' + html.escape(code) + "</pre>")
-        elif stype == "svg":
-            parts.append('<div class="svg-block">' + sec.get("code", "") + "</div>")
-        elif stype == "callout":
-            bg, fg = CALL_TONE.get(sec.get("tone", "info"), CALL_TONE["info"])
-            parts.append(
-                f'<div class="callout" style="background:{bg};border-left:4px solid {fg};color:{fg}">'
-                f"{inline_md(sec.get('body', ''))}</div>"
-            )
-        else:
-            parts.append(f'<p>[未知章节类型：{html.escape(stype)}]</p>')
+    parts = [render_section(sec) for sec in data.get("sections", [])]
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -112,6 +155,11 @@ def build_report(data):
   h1 {{ font-size: 26px; margin-bottom: 4px; }}
   .meta {{ color: #888; font-size: 13px; margin-bottom: 24px; }}
   h2 {{ font-size: 19px; border-bottom: 1px solid #eee; padding-bottom: 6px; margin-top: 32px; }}
+  h3 {{ font-size: 16px; margin: 18px 0 8px; }}
+  .cols {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 14px 0; }}
+  .col {{ min-width: 0; }}
+  .err {{ color: #8C1D1D; background: #FBE9E9; border: 1px dashed #c77; padding: 8px 12px; border-radius: 6px; }}
+  @media (max-width: 720px) {{ .cols {{ grid-template-columns: 1fr; }} }}
   table.data {{ border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 14px; }}
   table.data th, table.data td {{ border: 1px solid #ddd; padding: 6px 10px; text-align: right; }}
   table.data th {{ background: #f5f5f5; text-align: center; }}

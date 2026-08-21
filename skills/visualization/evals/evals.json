@@ -49,7 +49,11 @@
     { "id": "q2_output", "kind": "contains", "target": "SKILL.md", "text": "## Output Spec" },
     { "id": "q3_readme_install", "kind": "contains", "target": "README.md", "text": "## 安装" },
     { "id": "q4_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
-    { "id": "q5_ref_mermaid", "kind": "contains", "target": "SKILL.md", "text": "references/mermaid-zh.md" }
+    { "id": "q5_ref_mermaid", "kind": "contains", "target": "SKILL.md", "text": "references/mermaid-zh.md" },
+    { "id": "q6_svg_chart", "kind": "contains", "target": "SKILL.md", "text": "svg_chart.py" },
+    { "id": "q7_palette", "kind": "contains", "target": "SKILL.md", "text": "references/palette-zh.md" },
+    { "id": "q8_report_columns", "kind": "contains", "target": "SKILL.md", "text": "columns" },
+    { "id": "q9_ref_palette_exists", "kind": "file_exists", "target": "references/palette-zh.md" }
   ],
   "smoke_tests": [
     {
@@ -65,6 +69,23 @@
     {
       "id": "s3_report",
       "command": ["python3", "scripts/report_builder.py", "examples/report.example.json"]
+    },
+    {
+      "id": "s4_svg_bar",
+      "command": ["python3", "scripts/svg_chart.py", "--type", "bar", "--data",
+                  "{\"labels\":[\"1月\",\"2月\",\"3月\"],\"values\":[120,210,95]}",
+                  "--title", "月度销量"]
+    },
+    {
+      "id": "s5_svg_pie",
+      "command": ["python3", "scripts/svg_chart.py", "--type", "donut", "--data",
+                  "{\"labels\":[\"华东\",\"华南\",\"华北\"],\"values\":[41,37,22]}",
+                  "--title", "区域占比", "--palette", "tableau"]
+    },
+    {
+      "id": "s6_svg_hist",
+      "command": ["python3", "scripts/svg_chart.py", "--type", "histogram", "--data",
+                  "{\"values\":[1,2,2,3,3,3,4,5,5,6]}", "--bins", "5"]
     }
   ]
 }

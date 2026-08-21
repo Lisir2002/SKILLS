@@ -3,9 +3,9 @@
 把"画个图"的需求落地为可交付的可视化产物：**图谱（diagram）**、**图表（chart）**、**表格（table）**、**可视化报告（report）**。核心方法论：先选对图，再画好图。
 
 - 图谱：Mermaid 绘制流程图 / 时序图 / 思维导图 / 架构图 / 类图 / 状态图 / ER 图 / 甘特图 / 时间线等 11 种；
-- 图表：按"问题→图型"决策树选型（趋势→折线、对比→柱状、占比→饼图、相关→散点…），遵循 Tufte 设计原则（数据墨水比、坐标诚实、颜色语义化）；
+- 图表：按"问题→图型"决策树选型（趋势→折线、对比→柱状、占比→饼图、相关→散点…）；可用 `svg_chart.py` 离线渲染纯 SVG（8 种图型），遵循 Tufte 设计原则（数据墨水比、坐标诚实、颜色语义化）；
 - 表格：把 JSON / CSV 数据转成对齐良好、带千分位的 Markdown / CSV / HTML 表格；
-- 报告：把多图 + 表格 + 结论合成自包含、打印友好的 HTML 报告。
+- 报告：把多图 + 表格 + 结论合成自包含、打印友好的 HTML 报告，支持图表章节与多列看板布局。
 
 ## 什么时候用
 
@@ -34,21 +34,26 @@ mkdir -p <你的skills目录>/visualization
 
 ### 可选：脚本
 
-技能包附带三个纯标准库脚本，离线可运行：
+技能包附带四个纯标准库脚本，离线可运行：
 
 ```bash
 # 1. 选型顾问：不确定该画什么图时
 python3 scripts/viz_advisor.py "把这几个月的销量画成图"
 
-# 2. 表格生成器：数据 → Markdown/CSV/HTML
+# 2. 离线 SVG 图表生成器：数据 → 纯 SVG（bar/hbar/line/area/pie/donut/scatter/histogram）
+python3 scripts/svg_chart.py --type bar \
+  --data '{"labels":["1月","2月","3月"],"values":[120,210,95]}' --title "月度销量"
+
+# 3. 表格生成器：数据 → Markdown/CSV/HTML
 python3 scripts/table_builder.py --data '[{"月份":"1月","销量":120},{"月份":"2月","销量":210}]' \
   --title "月度销量" --thousands
 
-# 3. 报告合成器：JSON 配置 → 自包含 HTML 报告
+# 4. 报告合成器：JSON 配置 → 自包含 HTML 报告（支持 chart 章节与 columns 看板）
 python3 scripts/report_builder.py report.json -o report.html
 ```
 
-> 报告配置的示例见 [examples/report.example.json](examples/report.example.json)，可直接作为模板改写。
+> 报告配置的示例见 [examples/report.example.json](examples/report.example.json)，可直接作为模板改写（含折线图、环形占比、看板两列布局）。
+> 配色与无障碍规范（Okabe-Ito 色板 / WCAG 对比度 / 形状+颜色双重编码）见 [references/palette-zh.md](references/palette-zh.md)。
 
 ## 工作方式（四步）
 
@@ -65,21 +70,23 @@ visualization/
 ├── README.md                    # 本文件
 ├── scripts/
 │   ├── viz_advisor.py           # 可视化类型/子类型顾问（纯标准库）
+│   ├── svg_chart.py             # 离线 SVG 图表生成器（8 种图型，色盲安全配色）
 │   ├── table_builder.py         # 数据 → Markdown/CSV/HTML 表格
-│   └── report_builder.py        # JSON 配置 → 自包含 HTML 报告
+│   └── report_builder.py        # JSON 配置 → 自包含 HTML 报告（chart/columns 章节）
 ├── references/
 │   ├── mermaid-zh.md            # Mermaid 11 图种语法速查（含版本兼容注意）
 │   ├── chart-zh.md              # 图表选型决策树 + Tufte 设计原则
-│   └── svg-zh.md                # 手写 SVG 规范与示例
+│   ├── svg-zh.md                # 手写 SVG 规范与示例
+│   └── palette-zh.md            # 配色与无障碍规范（色板/对比度/双重编码）
 └── evals/
     └── evals.json               # 触发与质量测试用例
 ```
 
 ## 依赖
 
-- `python3`（可选，仅脚本需要）；三个脚本均零第三方依赖，可离线运行；
+- `python3`（可选，仅脚本需要）；四个脚本均零第三方依赖，可离线运行；`report_builder.py` 内联调用 `svg_chart.py`；
 - Mermaid 渲染预览需要支持的环境（Trae / VS Code 插件 / mermaid.live）；无渲染环境时以语法正确为验收标准；
-- `xychart-beta` 需要 Mermaid ≥ 10.3，低版本自动回退为表格 + 解读。
+- `xychart-beta` 需要 Mermaid ≥ 10.3，低版本自动回退为 `svg_chart.py` 离线 SVG 或表格 + 解读。
 
 ## 示例
 

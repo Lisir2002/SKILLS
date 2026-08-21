@@ -41,7 +41,7 @@ description: "Creates Mermaid diagrams, data charts, tables, and visualization r
 
 ### Step 2 — 生成（Generate）
 
-按类型执行。图种语法见 `references/mermaid-zh.md`；手写 SVG 规范见 `references/svg-zh.md`。
+按类型执行。图种语法见 `references/mermaid-zh.md`；手写 SVG 规范见 `references/svg-zh.md`；配色与无障碍规范见 `references/palette-zh.md`。
 
 **diagram**：用 Mermaid 代码块输出。只允许下表图种，**不编造未验证的语法**：
 
@@ -59,7 +59,19 @@ description: "Creates Mermaid diagrams, data charts, tables, and visualization r
 | `mindmap` | 思维导图 / 主题发散 |
 | `timeline` | 时间线 / 里程碑 |
 
-**chart**：优先 Mermaid（`pie` / `xychart-beta`）；渲染器不支持 `xychart-beta` 时回退为**表格 + 文字解读**；需要精细样式时按 `references/svg-zh.md` 手写 SVG；**不承诺**生成真实位图图表（PNG/JPG）。
+**chart**：优先用 `svg_chart.py` **离线渲染为纯 SVG**（不依赖 Mermaid 版本、可内嵌 Markdown/HTML/报告），支持 bar/hbar/line/area/pie/donut/scatter/histogram 八种类型，默认 Okabe-Ito 色盲安全配色：
+
+```bash
+# 柱状 / 折线 / 饼图 / 散点 / 直方图
+python3 scripts/svg_chart.py --type bar --data '{"labels":["1月","2月","3月"],"values":[120,210,95]}' --title "月度销量"
+python3 scripts/svg_chart.py --type line --data '{"labels":["1月","2月"],"series":[{"name":"销量","values":[120,210]},{"name":"成本","values":[80,90]}]}' -o chart.svg
+python3 scripts/svg_chart.py --type pie --data '{"labels":["搜索","直访"],"values":[45,30]}' --title "流量占比"
+python3 scripts/svg_chart.py --type scatter --data '{"points":[{"x":1,"y":3},{"x":2,"y":5}]}'
+python3 scripts/svg_chart.py --type histogram --data '{"values":[1,2,2,3,3,3,4,5,5,6]}' --bins 5
+# 可选：--palette tableau|antv 换色板；--show-values 标注数值；-o 输出文件
+```
+
+> 多系列务必用"形状 + 颜色"双重编码（实线/虚线区分系列、图例标百分比），对比度与色板规则见 `references/palette-zh.md`。渲染器支持 Mermaid 时也可用 `pie` / `xychart-beta`（需 ≥10.3，否则回退表格+解读或 SVG）。
 
 **table**：数据规整后跑脚本生成对齐良好的表格：
 
@@ -67,11 +79,34 @@ description: "Creates Mermaid diagrams, data charts, tables, and visualization r
 python3 scripts/table_builder.py --data '<JSON>' --title '<标题>' [--thousands] [--format md|csv|html]
 ```
 
-**report**：把多张图 + 表格 + 文字结论组织成配置，跑脚本生成自包含 HTML 报告：
+**report**：把多张图 + 表格 + 文字结论组织成配置，跑脚本生成自包含 HTML 报告。支持 `chart` 章节（离线 SVG 图表）与 `columns` 章节（多列看板布局）：
 
 ```bash
 python3 scripts/report_builder.py <report.json> -o report.html
 ```
+
+```json
+{
+  "title": "2026 Q3 运营数据报告",
+  "sections": [
+    {"type": "chart", "heading": "销量趋势",
+     "chart": {"type": "line", "title": "月度销量", "show_values": true,
+               "data": {"labels": ["7月","8月","9月"],
+                        "series": [{"name":"销量","values":[220,150,340]}]}}},
+    {"type": "columns", "heading": "关键指标看板", "widths": [1, 1],
+     "cols": [
+       [{"type": "chart", "heading": "区域占比",
+         "chart": {"type": "donut", "title": "Q3 区域占比",
+                   "data": {"labels": ["华东","华南","华北"], "values": [41,37,22]}}}],
+       [{"type": "table", "heading": "分区域销量",
+         "table": {"headers": ["区域","Q2","Q3","环比"],
+                   "rows": [["华东",1200,1500,"+25%"],["华南",1100,1350,"+23%"]]}}]
+     ]}
+  ]
+}
+```
+
+`columns` 的 `widths` 控制各列宽比例（缺省等宽）；看板内子章节标题自动降级为 h3；离线 SVG 图表无需网络。
 
 ### Step 3 — 校验（Verify）
 
@@ -91,9 +126,9 @@ python3 scripts/report_builder.py <report.json> -o report.html
 
 ## Output Spec
 
-- **diagram / chart**：输出可直接渲染的 Mermaid / SVG 代码块 + 一行"图注 / 结论"。SVG 需含 `viewBox`、可缩放、含 `<title>` 与 `<desc>`（无障碍）；
+- **diagram / chart**：输出可直接渲染的 Mermaid / SVG 代码块 + 一行"图注 / 结论"。SVG 需含 `viewBox`、可缩放、含 `<title>` 与 `<desc>`（无障碍）、配色符合 palette-zh.md（默认 Okabe-Ito，对比度 ≥4.5:1，双重编码）；
 - **table**：Markdown 表格（含表头、对齐，必要时千分位与合计行）；用户要 CSV / HTML 时用脚本转换；
-- **report**：自包含 HTML（内联样式、可离线打开、打印友好）；或按用户环境给 Markdown 版报告；
+- **report**：自包含 HTML（内联样式、可离线打开、打印友好）；支持 chart 章节与 columns 多列看板；或按用户环境给 Markdown 版报告；
 - **契约**：涉及数据给来源与口径；图表配"结论一句话"；**不得伪造数据或坐标**（不能为了好看截断坐标轴）；
 - 用户要求导出文件时，写入 `.md` / `.html` / `.csv` 并给出路径。
 
@@ -103,12 +138,13 @@ python3 scripts/report_builder.py <report.json> -o report.html
 - **语法编造**：写了渲染器不认识的 Mermaid 图种/语法——只用上表图种，不确定先查 mermaid-zh.md；
 - **装饰过度**：3D、阴影、渐变、背景网格堆砌，数据墨水比崩塌；
 - **数字失真**：截断坐标轴、百分比不合计、单位缺失、颜色误导（红=好/绿=坏要统一）；
-- **一次性硬编码**：把大数据写死在 SVG 里且不可维护——数据点 >20 先考虑表格或脚本生成；
+- **颜色误导 / 不可读**：仅靠颜色区分系列（色盲用户读不出）、正文对比度 <4.5:1、系列超过 7 个——按 palette-zh.md 用 Okabe-Ito + 形状双编码；
+- **一次性硬编码**：把大数据写死在 SVG 里且不可维护——数据点 >20 先考虑 `svg_chart.py` 脚本生成或表格；
 - **跳过校验**：只输出不渲染、不检查语法，交付了打不开的图。
 
 ## Dependencies
 
-- `python3`（可选）：`scripts/viz_advisor.py` / `table_builder.py` / `report_builder.py`，均**纯标准库**、离线可运行；
+- `python3`（可选）：`scripts/viz_advisor.py` / `svg_chart.py` / `table_builder.py` / `report_builder.py`，均**纯标准库**、离线可运行；`report_builder.py` 依赖同目录 `svg_chart.py`；
 - 渲染预览需要支持 Mermaid 的环境（Trae / VS Code 插件 / mermaid.live 等）；无渲染环境时以**语法正确 + 结构自检**为验收标准。
 
 ## References
@@ -116,6 +152,7 @@ python3 scripts/report_builder.py <report.json> -o report.html
 - Mermaid 图种与语法速查（含版本兼容注意）：[references/mermaid-zh.md](references/mermaid-zh.md)
 - 图表选型决策树与设计原则（Tufte）：[references/chart-zh.md](references/chart-zh.md)
 - 手写 SVG 规范与示例：[references/svg-zh.md](references/svg-zh.md)
+- 配色与无障碍规范（色板/对比度/双重编码）：[references/palette-zh.md](references/palette-zh.md)
 
 ## Examples
 
@@ -132,6 +169,26 @@ xychart-beta
 ```
 
 > 结论：3 月回落、4 月创季度新高，折线图最能看出趋势。若渲染器不支持 xychart-beta，回退为下面这张表 + 一句解读。
+
+**输入**：`根据这组数据画个图：1月 120，2月 210，3月 95，4月 340`（渲染器不支持 xychart-beta 时）
+
+**输出**（离线 SVG，无需网络；默认 Okabe-Ito 色盲安全配色）：
+
+```bash
+python3 scripts/svg_chart.py --type line --data \
+  '{"labels":["1月","2月","3月","4月"],"values":[120,210,95,340]}' \
+  --title "月度访问量" --show-values
+```
+
+```svg
+<svg viewBox="0 0 720 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t d">
+  <title id="t">月度访问量</title>
+  <desc id="d">折线图，共 4 个类别。3 月回落、4 月创季度新高。</desc>
+  <!-- 由 svg_chart.py 生成：坐标轴 + 网格 + 折线 + 数据点 + 数值标签 -->
+</svg>
+```
+
+> 结论：3 月回落、4 月创季度新高。SVG 含 `<title>`/`<desc>`，可缩放、可离线内嵌文档与报告。
 
 **输入**：`画一个用户登录的时序图`
 
