@@ -52,6 +52,7 @@ SKILLS/
 | 🛠️ 工具与环境 | [tool-usage-conventions](skills/tool-usage-conventions/) | 0.1.0 | 工具使用约定：文件/命令/容器兼容/路径/Android 构建 SOP + BusyBox 兼容自检器 | 已发布 |
 | 📊 数据可视化 | [visualization](skills/visualization/) | 0.7.0 | 可视化：Mermaid 图谱（11 图种）/ 离线 SVG 图表（8 图型，色盲安全配色）/ 表格 / HTML 报告（chart+columns 看板）+ 四个纯标准库脚本 | 已发布 |
 | 💡 创新思维 | [creative-mind](skills/creative-mind/) | 0.1.0 | 通用创新引擎：破解模式坍缩，跳出固化思想造新东西——破固化→发散(12+技法)→收敛→验新四步 + 发散脚手架/固化度检测两脚本 | 已发布 |
+| 💡 创新思维 | [frame-breaker](skills/frame-breaker/) | 0.1.0 | 认知突破·变革式创造引擎：改变问题本身而非在框架内找更好答案——挖假设→反演→域外移植→重构→落地五步 + 假设审计/框架突破度两脚本 | 已发布 |
 
 > 每个技能完成、确认、打包后，在此登记，并在 `CHANGELOG.md` 中记录。
 

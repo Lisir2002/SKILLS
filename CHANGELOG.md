@@ -3,6 +3,19 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.9.0] - 2026-08-21
+
+### 新增
+- 第七个技能包 **`frame-breaker`（认知突破 · 变革式创造引擎）**：让模型**改变问题本身**而非在问题里找更好的答案，补齐模型天然缺失的"变革式创造"能力
+  - 源码 `skills/frame-breaker/`，压缩包 `packages/frame-breaker.zip`
+  - 理论依据 Boden 三分法 + 剑桥 van der Schaar《Creativity in Machine Learning》：LLM 天然擅长组合式/探索式创造，但"修改问题表述、改变定义搜索空间的表征机制"（变革式创造）不会自然涌现；895 火柴棒实验实证三模型默认"最小数=最小正数"无法自破框
+  - 五步变革引擎：挖假设（六维度显式化隐含假设）→ 反演假设（逐条取反建反世界）→ 域外移植（借无关领域规则系统重定义问题）→ 重构问题（产出新表述+框架前后对比）→ 归零落地（30 天路径+最小验证）
+  - 两脚本纯标准库离线：`assumption_audit.py` 隐含假设审计（六维挖掘脚手架 + 框架残留信号扫描 + 20+ 领域规则库）、`frame_gap.py` 框架突破度检测（bigram 结构相似度 + 新颖实词占比 → 0-100，识别"换皮式重构"）
+  - references 三文档：`transformational-zh.md` 变革式创造理论、`assumptions-zh.md` 六维假设清单与常见认知框架、`domains-zh.md` 域外移植领域规则库
+  - 与 creative-mind 互补：creative-mind 做组合式/探索式（在框架内更好），frame-breaker 做变革式（改变框架本身）
+  - evals 20 用例（触发 6 + 质量 10 + 冒烟 4，含真重构/换皮对比）全通过
+- 仓库 evals 用例数由 78 增至 98，全部通过；`validate_skills.py` 对 frame-breaker 校验 0 错误 0 警告
+
 ## [0.8.0] - 2026-08-21
 
 ### 新增

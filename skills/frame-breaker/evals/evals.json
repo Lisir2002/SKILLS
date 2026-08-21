@@ -1,0 +1,71 @@
+{
+  "skill_name": "frame-breaker",
+  "trigger_evals": [
+    {
+      "id": "t1_break_cognition",
+      "prompt": "帮我突破认知，重新想想这个问题",
+      "must_trigger": true,
+      "keywords": ["突破认知", "重新"]
+    },
+    {
+      "id": "t2_out_of_frame",
+      "prompt": "跳出框架，别在原框架里想",
+      "must_trigger": true,
+      "keywords": ["跳出框架", "别在原框架里想"]
+    },
+    {
+      "id": "t3_reframe",
+      "prompt": "这个问题本身可能定义错了，帮我重构一下",
+      "must_trigger": true,
+      "keywords": ["重构", "定义错了"]
+    },
+    {
+      "id": "t4_break_rules",
+      "prompt": "我要打破常规，重新定义这个需求",
+      "must_trigger": true,
+      "keywords": ["打破常规", "重新定义"]
+    },
+    {
+      "id": "t5_negative_creative",
+      "prompt": "帮我想几个有创意的营销点子",
+      "must_trigger": false,
+      "keywords": ["突破认知", "跳出框架", "重构问题", "破框", "重新定义问题", "变革"]
+    },
+    {
+      "id": "t6_negative_parse",
+      "prompt": "帮我解析这个抖音链接",
+      "must_trigger": false,
+      "keywords": ["突破认知", "跳出框架", "重构问题", "破框"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_five_steps", "kind": "contains", "target": "SKILL.md", "text": "Step 1 · 挖假设" },
+    { "id": "q3_theory_ref", "kind": "contains", "target": "SKILL.md", "text": "transformational-zh.md" },
+    { "id": "q4_script_ref", "kind": "contains", "target": "SKILL.md", "text": "frame_gap.py" },
+    { "id": "q5_script_ref2", "kind": "contains", "target": "SKILL.md", "text": "assumption_audit.py" },
+    { "id": "q6_cross_ref", "kind": "contains", "target": "SKILL.md", "text": "creative-mind" },
+    { "id": "q7_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
+    { "id": "q8_no_secret2", "kind": "not_contains", "target": "SKILL.md", "text": "sk_test_" },
+    { "id": "q9_audit_cli", "kind": "contains", "target": "scripts/assumption_audit.py", "text": "--problem" },
+    { "id": "q10_gap_cli", "kind": "contains", "target": "scripts/frame_gap.py", "text": "--original" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_audit",
+      "command": ["python3", "scripts/assumption_audit.py", "--problem", "电梯太慢怎么办"]
+    },
+    {
+      "id": "s2_audit_domains",
+      "command": ["python3", "scripts/assumption_audit.py", "--domains", "--json"]
+    },
+    {
+      "id": "s3_gap_true",
+      "command": ["python3", "scripts/frame_gap.py", "--original", "如何让电梯更快", "--reframed", "如何让等待变得值得", "--solution", "电梯里做内容幕间，管理乘客对时间的感知", "--json"]
+    },
+    {
+      "id": "s4_gap_fake",
+      "command": ["python3", "scripts/frame_gap.py", "--original", "如何提升电梯速度", "--reframed", "怎样让电梯跑得更快", "--solution", "优化电机转速", "--json"]
+    }
+  ]
+}
