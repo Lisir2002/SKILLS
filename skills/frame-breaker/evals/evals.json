@@ -54,7 +54,15 @@
     { "id": "q13_blend_ref", "kind": "contains", "target": "SKILL.md", "text": "concept_blend.py" },
     { "id": "q14_analogy_ref", "kind": "contains", "target": "SKILL.md", "text": "analogy_map.py" },
     { "id": "q15_blend_cli", "kind": "contains", "target": "scripts/concept_blend.py", "text": "--a" },
-    { "id": "q16_analogy_cli", "kind": "contains", "target": "scripts/analogy_map.py", "text": "--source" }
+    { "id": "q16_analogy_cli", "kind": "contains", "target": "scripts/analogy_map.py", "text": "--source" },
+    { "id": "q17_fidelity_section", "kind": "contains", "target": "SKILL.md", "text": "创造保真与可验证" },
+    { "id": "q18_intent_flag", "kind": "contains", "target": "SKILL.md", "text": "--intent" },
+    { "id": "q19_verify_ref", "kind": "contains", "target": "SKILL.md", "text": "verify_claim.py" },
+    { "id": "q20_verify_cli", "kind": "contains", "target": "scripts/verify_claim.py", "text": "--claim" },
+    { "id": "q21_gap_intent_cli", "kind": "contains", "target": "scripts/frame_gap.py", "text": "--intent" },
+    { "id": "q22_cognition_fidelity", "kind": "contains", "target": "references/cognition-zh.md", "text": "意图保真" },
+    { "id": "q23_cognition_divpo", "kind": "contains", "target": "references/cognition-zh.md", "text": "DivPO" },
+    { "id": "q24_falsify_principle", "kind": "contains", "target": "SKILL.md", "text": "证伪优先" }
   ],
   "smoke_tests": [
     {
@@ -88,6 +96,22 @@
     {
       "id": "s8_analogy_drama",
       "command": ["python3", "scripts/analogy_map.py", "--source", "戏剧的悬念", "--target", "电梯等待"]
+    },
+    {
+      "id": "s9_verify_claim",
+      "command": ["python3", "scripts/verify_claim.py", "--claim", "电梯里放镜子能降低乘客等待焦虑", "--domain", "建筑心理学"]
+    },
+    {
+      "id": "s10_verify_json",
+      "command": ["python3", "scripts/verify_claim.py", "--claim", "永久记忆外置芯片是解决遗忘的手段", "--json"]
+    },
+    {
+      "id": "s11_gap_intent_ok",
+      "command": ["python3", "scripts/frame_gap.py", "--original", "如何让电梯更快", "--reframed", "如何让等待变得值得", "--intent", "解决用户对电梯慢的抱怨", "--solution", "电梯里做内容幕间，管理乘客对时间的感知", "--json"]
+    },
+    {
+      "id": "s12_gap_intent_drift",
+      "command": ["python3", "scripts/frame_gap.py", "--original", "如何让电梯更快", "--reframed", "如何用电梯做餐厅", "--intent", "解决用户对电梯慢的抱怨", "--solution", "在电梯里开餐厅", "--json"]
     }
   ]
 }

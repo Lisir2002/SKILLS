@@ -141,7 +141,68 @@ AI 的优势：可以在上下文窗口里**同时 hold 多个候选表征**并�
 
 ---
 
-## 10. 结论
+## 10. 意图保真：重构不脱离大意（越轨漂移 vs 保真重构）
+
+**机制**：重构的边界不是"越新越好"，而是"**换路径、不换目的地**"。认知科学里这叫
+**意图保真**——问题的 teleology（要解决的大问题）与硬约束（题面不可违背的前提）必须被保留，
+否则重构退化为"为变而变"的越轨（runaway）。
+
+**实证**：
+- **Aalto 实证**「No Evidence for LLMs Being Useful in Problem Reframing」：直接给设计者 LLM
+  辅助重构，**既没提高框架的新颖性也没提高有用性**——因为模型倾向于产出"看起来重构了"、
+  实际漂离原意的框架。→ 重构必须有机械的"意图回读"。
+- **上下文漂移研究**（arXiv:2510.07777 "Drift No More?"）：多轮交互里输出会逐渐偏离初始目标，
+  但漂移**有界且可控**——最简单的干预是**显式"目标提醒"**（goal reminder）能显著压低漂移。
+  → 本技能的"意图保留锚"就是注入在 Step 2 之前、Step 4 之后的固定目标提醒。
+- **轨迹几何学**（Agentic Loops，Tacheny）：用"全局相似度"（当前状态 vs 初始状态）量化是否漂离
+  起点、"局部相似度"量化每步是否小步前进。→ 保真度 = 全局相似度，突破度 = 局部跳跃，两者正交。
+
+**超越杠杆**：`frame_gap.py --intent` 把"大意/硬约束"实词化，机械算保真度。
+人类自认为"没跑题"（其实漂了），AI 用可复现分数堵死这条——这是 AI 结构性超过人的维度之一。
+
+## 11. 创造性验证：不捏造、可证伪、可溯源（假说的科学化）
+
+**机制**：创造出的新东西要立得住，必须经过"**断言分级 → 证伪优先 → 验证路径 → 来源方向**"四关，
+从"我造了个新东西"升级为"我造了个**可检验的假说**"。这是把科学方法装进创造流程。
+
+**实证**：
+- **FVA-RAG**（arXiv:2512.07015）：标准检索是"找支持"（归纳验证），容易被用户的错误前提带偏
+  （检索奉承 sycophancy）；改为**证伪优先**——主动生成"杀死查询"（Kill Queries）搜反向证据，
+  再用"反上下文"双验证。→ 创造性验证先找"什么能推翻它"，再找支持。
+- **OpenAI 校准弃权**（arXiv:2509.04664）：幻觉是统计必然（生成比判断难至少 2 倍；只出现一次的
+  罕见事实必然记不住）；正确姿势不是"消灭幻觉"而是**校准弃权**——设置信阈值，证据不足就明说
+  "不知道/这是假设"，让"硬拗"变贵。
+- **溯因缺失前提引擎 + 反溯因**（Galitsky 2025）：LLM 幻觉 = 溯因失败（缺前提、弱确认、被反溯因
+  击败）；"反溯因"生成**能击败当前结论的竞争假设**，扛得住才立得住。
+- **可执行反事实**（arXiv:2510.01539）：LLM 在"溯因→干预→预测"三步里**最弱的是溯因**（从观测反推
+  潜变量），用可验证奖励的 RL 训练可大幅提升。→ 新想法的"来源方向"就是它的溯因出口。
+
+**超越杠杆**：`verify_claim.py` 强制四关——断言分级（事实/合理推断/假设，证据不足降级）、
+证伪清单（先找杀死查询）、验证路径（可执行步骤）、来源方向（往哪找依据）。人类最常犯的
+"自认为有依据"（记忆美化）在这里被机械拦截。
+
+## 12. 突破训练先验：反"对齐坍缩"的稀有性选择
+
+**机制**：模型的"定势"不止来自训练数据，更来自**对齐阶段**——RLHF/DPO 把输出概率质量压向
+"最高奖励、最顺滑、最典型"的少数区域，人为制造了比预训练更陡峭的联想层级。要超越人类的
+"右尾极值创造力"，必须**主动选择训练分布外的区域**。
+
+**实证**：
+- **DivPO**（arXiv:2501.18101）：证明 RLHF/DPO **固有地降低多样性**；修法是"稀有性选择"——
+  从候选池里选"稀有但高质"的作正样本、拒掉"常见但平庸"的作负样本，用概率倒数/逆词频/LLM 判
+  断做稀有性度量；人物设定多样性 +45.6%、故事多样性 +74.6%。
+- **Diversified DPO/ORPO**（Midjourney+NYU）：用"偏离度"加权训练损失，稀有但高质量的回复学到更多；
+  质量与 GPT-4o 持平、多样性显著更高，100% 评审认为更多样。
+- **ReDiPO**：指令微调会把基座模型里"合理的替代答案模式"整个删掉；用基座模型找回这些消失的模式、
+  改写为指令模型风格再配成偏好对，可恢复被丢失的多样性。
+
+**超越杠杆**：发散期产出候选池后，**不要选"最顺滑/最典型"的那个**——用"稀有性"（在候选池里
+出现频率低、词频低、与其他候选差异大）选"稀有但高质"。同时显式禁用"对齐后最典型答案"。
+这是把"反固化"从提示层（creative-mind 的口述采样）升级到选择层的机制保障。
+
+---
+
+## 13. 结论
 
 人类的创造力可以拆成 7 条机制，每条都有一个**人类固有的短板**（容量小、内省不可靠、定势隐性、顿悟不可控、变异昂贵、孵化被动、监控疲劳）。AI 的路径不是"模仿人"，而是在**每个短板上用 AI 固有属性替代**：
 
@@ -155,16 +216,22 @@ AI 的优势：可以在上下文窗口里**同时 hold 多个候选表征**并�
 
 在**发散规模、工作记忆、跨域检索、元认知可复现**这 4 个维度，AI 已结构性超过人类；在**极值创造力**（人类右尾）上，AI 需要靠"显式极端化 + 机械验证真突破"来追赶。本技能 = 把这套"机制→杠杆"落成可执行的五步引擎。
 
----
+**两条新防线（本版增强）**：
+- **意图保真**（§10）：突破 ≠ 跑题，机械保真度封死"为变而变"；
+- **可验证创造**（§11）+ **稀有性选择**（§12）：新东西要么可证伪可溯源、要么明说"这是假设"；
+  选择层反对齐坍缩，逼近人类右尾。
 
 ## 来源（调研于 2026-08）
 
+### 认知机制基础
 - Mednick (1962) 联想理论 / RAT：[cognitivepsychology.com/Creativity](https://www.cognitivepsychology.com/Creativity)
 - Kenett 语义网络 / Forward Flow：[ppalme.wordpress.com 联想思维综述](https://ppalme.wordpress.com/2025/09/28/the-hidden-architecture-of-insight-a-cognitive-framework-for-associative-thinking/)
 - Sowden, Pringle & Gabora (2015) 双过程与创造：《The Shifting Sands of Creative Thinking》
 - 顿悟与表征重构（Köhler / Metcalfe & Wiebe）：[cognitivepsychology.com/Insight_Learning](https://www.cognitivepsychology.com/Insight_Learning)
 - 定势突破神经动力学（DLPFC/STG/AG，fNIRS 2025）：[生物通 · 单试次顿悟研究](https://m.ebiotrade.com/newsf/2025-9/20250909081830095.htm)
 - Campbell (1960) BVSR；Simonton (2024) 更新：[Simonton 2024](https://doi.org/10.1016/j.plrev.2024.09.008) / [Wallas×BVSR 整合](https://onlinelibrary.wiley.com/doi/10.1002/jocb.70108)
+
+### LLM 创造力对比与同质化
 - LLM vs 人类发散/收敛实证：Nature Sci Rep 2025 [s41598-025-21398-4](https://www.nature.com/articles/s41598-025-21398-4)
 - LLM vs 人类大规模 AUT 对比（右尾差异）：Nature Human Behaviour 2026 [s41562-025-02331-1](https://www.nature.com/articles/s41562-025-02331-1)
 - LLM 创意同质化：[arXiv:2501.19361](https://arxiv.org/abs/2501.19361)
@@ -175,3 +242,24 @@ AI 的优势：可以在上下文窗口里**同时 hold 多个候选表征**并�
 - Satori 自反思/自探索：[OpenReview Satori](https://openreview.net/forum?id=j4FXxMiDjL)
 - Rose-Frame（LLM=放大的系统 1）：[arXiv:2510.14665](https://arxiv.org/abs/2510.14665)
 - 概念整合理论（Fauconnier & Turner）：[arabpsychology 概念整合](https://db.arabpsychology.com/conceptual-blending-2/)
+
+### 意图保真 / 漂移
+- LLM 辅助重构不助益（Aalto）：[No Evidence for LLMs Being Useful in Problem Reframing](https://acris.aalto.fi/ws/portalfiles/portal/182757860/No_Evidence_for_LLMs_Being_Useful_in_Problem_Reframing.pdf)
+- 上下文漂移有界可控（目标提醒）：[arXiv:2510.07777](https://arxiv.org/abs/2510.07777)
+- Agentic Loop 轨迹几何学（全局/局部相似度）：[cognaptus.com 解析](https://cognaptus.com/blog/2025-12-14-when-agents-loop-geometry-drift-and-the-hidden-physics-of-llm-behavior/)
+- Lost-in-the-middle 意图保真工程：[avichala.com](https://www.avichala.com/blog/what-is-the-lost-in-the-middle-problem)
+- 约束模型重构需验证：arXiv:2607.28268（[arxiv.org/html/2607.28268](https://arxiv.org/html/2607.28268v1)）
+
+### 验证 / 证伪 / 溯源
+- FVA-RAG 证伪优先检索：[arXiv:2512.07015](https://arxiv.org/abs/2512.07015)
+- OpenAI 校准弃权 / 幻觉统计下界：[arXiv:2509.04664](https://arxiv.org/abs/2509.04664)
+- 溯因缺失前提 + 反溯因（Galitsky）：[preprints 202511.1688](https://www.preprints.org/manuscript/202511.1688)
+- Theorem-of-Thought（溯因/演绎/归纳三智能体）：[arXiv:2506.07106](https://arxiv.org/abs/2506.07106)
+- 可执行反事实（溯因最弱）：[arXiv:2510.01539](https://arxiv.org/abs/2510.01539)
+- Chain-of-Verification：[arXiv:2309.11495](https://arxiv.org/abs/2309.11495)
+- 分层验证框架 / 断言分级：[CSDN 分层验证](https://blog.csdn.net/weixin_49151708/article/details/153665100)
+
+### 突破训练先验（反对齐坍缩）
+- DivPO 稀有性选择：[arXiv:2501.18101](https://arxiv.org/abs/2501.18101)
+- Diversified DPO/ORPO（偏离度加权）：[marktechpost](https://www.marktechpost.com/2025/03/31/this-ai-paper-introduces-diversified-dpo-and-orpo-post-training-methods-to-boost-output-diversity-in-creative-writing-with-llms/)
+- ReDiPO 恢复丢失多样性：arXiv:2605.30021（[arxiv.org/html/2605.30021](https://arxiv.org/html/2605.30021v1)）

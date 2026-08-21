@@ -2,7 +2,9 @@
 
 让模型**改变问题本身**，而不是在问题里找更好的答案。这是创造的最高阶——Boden 称之为"变革式创造"（transformational creativity）：修改问题表述、改变定义搜索空间的框架本身。模型天然缺这个能力（它默认在训练数据设定的框架内作答），本技能用五步引擎强制执行。
 
-技能内含**思维引擎层**：把人类创造性思维拆成 7 条实证机制（远程联想/定势/双过程/顿悟/盲变-选择/孵化/元认知），每条机制配一条"AI 超越杠杆"——在人类固有短板上用 AI 固有属性反超（详见 [references/cognition-zh.md](references/cognition-zh.md)）。
+技能内含**思维引擎层**：把人类创造性思维拆成 7 条实证机制（远程联想/定势/双过程/顿悟/盲变-选择/孵化/元认知）+ **突破训练先验**，每条机制配一条"AI 超越杠杆"——在人类固有短板上用 AI 固有属性反超（详见 [references/cognition-zh.md](references/cognition-zh.md)）。
+
+并内置**创造保真与可验证**三条硬纪律：①意图保留锚（重构不脱离大意，frame_gap --intent 机械打分）②断言分级（事实/推断/假设，不捏造、证据不足降级）③证伪优先（新东西必须能答"什么能推翻它+怎么验证+往哪找依据"，verify_claim.py 强制）。
 
 > 与 [creative-mind](creative-mind/README.md) 的关系：creative-mind 是"在框架内做得更好"（组合式+探索式），本技能是"改变框架本身"（变革式）。互补使用。
 
@@ -47,15 +49,24 @@ python3 scripts/concept_blend.py --a "电梯" --b "戏剧"
 python3 scripts/analogy_map.py --source "气象锋面" --target "电梯太慢"
 ```
 
-### 可选：框架差距检测（脚本）
+### 可选：框架差距 + 意图保真检测（脚本）
 
-验证重构是否真的发生（不是换皮）：
+验证重构是否真的发生（不是换皮），**且没脱离大意**（传入 --intent 加算保真度，防跑题）：
 
 ```bash
 python3 scripts/frame_gap.py --original "如何让电梯更快" --reframed "如何让等待变得值得" --solution "电梯里做内容幕间，管理乘客对时间的感知"
+python3 scripts/frame_gap.py --original "如何让电梯更快" --reframed "如何让等待变得值得" --intent "解决用户对电梯慢的抱怨" --solution "电梯里做内容幕间，管理乘客对时间的感知"
 ```
 
-输出"框架突破度"（0-100）：低于 60 说明还是换皮，回去再反演一轮。
+输出"框架突破度"+"意图保真度"（各 0-100）：突破度 <60 说明还是换皮；保真度 <60 说明跑题了。
+
+### 可选：断言验证脚手架（脚本）
+
+创造出的新东西必须可验证、可溯源（断言分级 + 证伪 + 验证路径 + 来源方向）：
+
+```bash
+python3 scripts/verify_claim.py --claim "电梯里放镜子能降低乘客等待焦虑" --domain "建筑心理学"
+```
 
 ## 工作方式（五步变革引擎 + 思维引擎层）
 
@@ -71,18 +82,19 @@ python3 scripts/frame_gap.py --original "如何让电梯更快" --reframed "如�
 
 ```
 frame-breaker/
-├── SKILL.md                     # 技能定义（五步变革引擎 + 思维引擎层）
+├── SKILL.md                     # 技能定义（五步变革引擎 + 思维引擎层 + 保真与可验证）
 ├── README.md                    # 本文件
 ├── scripts/
 │   ├── assumption_audit.py      # 挖隐含假设 + 域外领域规则库（纯标准库）
-│   ├── frame_gap.py             # 框架突破度检测：是否真的重构了（纯标准库）
+│   ├── frame_gap.py             # 框架突破度 + 意图保真度检测（纯标准库）
 │   ├── concept_blend.py         # 概念融合脚手架：两远域→涌现结构（纯标准库）
-│   └── analogy_map.py           # 类比映射脚手架：只借关系结构（纯标准库）
+│   ├── analogy_map.py           # 类比映射脚手架：只借关系结构（纯标准库）
+│   └── verify_claim.py          # 断言验证脚手架：分级+证伪+验证路径+来源方向（纯标准库）
 └── references/
     ├── transformational-zh.md   # 变革式创造理论（Boden 三分法 + 895 实验证据）
     ├── assumptions-zh.md        # 六维度假设清单 + 常见认知框架
     ├── domains-zh.md            # 域外移植领域-规则库（20+ 领域世界观）
-    └── cognition-zh.md          # 思维引擎层：人类思维机制 → AI 超越杠杆 + 实证数据
+    └── cognition-zh.md          # 思维引擎层：7+1 机制 → AI 超越杠杆 + 意图保真/可验证/稀有性选择
 ```
 
 ## 依赖
