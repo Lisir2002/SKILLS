@@ -1,0 +1,77 @@
+{
+  "skill_name": "image-sense",
+  "trigger_evals": [
+    {
+      "id": "t1_identify_image",
+      "prompt": "帮我识别图片的信息",
+      "must_trigger": true,
+      "keywords": ["识别图片"]
+    },
+    {
+      "id": "t2_read_info",
+      "prompt": "读取图片信息，告诉我是什么格式、多大",
+      "must_trigger": true,
+      "keywords": ["读取图片信息"]
+    },
+    {
+      "id": "t3_color_brightness",
+      "prompt": "这张图片主色调是什么，明暗如何",
+      "must_trigger": true,
+      "keywords": ["主色调", "明暗"]
+    },
+    {
+      "id": "t4_exif_meta",
+      "prompt": "提取这张图片的EXIF和拍摄时间",
+      "must_trigger": true,
+      "keywords": ["EXIF", "拍摄时间"]
+    },
+    {
+      "id": "t5_similarity",
+      "prompt": "帮我比对这两张图片，做相似图检索",
+      "must_trigger": true,
+      "keywords": ["相似图"]
+    },
+    {
+      "id": "t6_negative_generate",
+      "prompt": "帮我把这张照片做成AI绘画风格",
+      "must_trigger": false,
+      "keywords": ["识别图片", "读取图片信息", "主色调", "EXIF", "相似图", "图片内容"]
+    },
+    {
+      "id": "t7_negative_ocr",
+      "prompt": "把图片里的文字OCR出来",
+      "must_trigger": false,
+      "keywords": ["识别图片", "EXIF", "相似图", "图片内容"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_pure_stdlib", "kind": "contains", "target": "SKILL.md", "text": "纯标准库" },
+    { "id": "q3_honest_boundary", "kind": "contains", "target": "SKILL.md", "text": "诚实边界" },
+    { "id": "q4_script_ref", "kind": "contains", "target": "SKILL.md", "text": "image_sense.py" },
+    { "id": "q5_json_flag", "kind": "contains", "target": "SKILL.md", "text": "--json" },
+    { "id": "q6_make_test_png", "kind": "contains", "target": "SKILL.md", "text": "--make-test-png" },
+    { "id": "q7_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
+    { "id": "q8_no_secret2", "kind": "not_contains", "target": "SKILL.md", "text": "sk_test_" },
+    { "id": "q9_script_paeth", "kind": "contains", "target": "scripts/image_sense.py", "text": "Paeth" },
+    { "id": "q10_script_dhash", "kind": "contains", "target": "scripts/image_sense.py", "text": "dhash" },
+    { "id": "q11_script_exif", "kind": "contains", "target": "scripts/image_sense.py", "text": "GPS" },
+    { "id": "q12_ref_semantics", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "语义" },
+    { "id": "q13_ref_paeth", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "Paeth" },
+    { "id": "q14_ref_dqt", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "DQT" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_make_and_analyze",
+      "command": ["bash", "-c", "python3 scripts/image_sense.py --make-test-png /tmp/is_test.png && python3 scripts/image_sense.py /tmp/is_test.png --json >/dev/null"]
+    },
+    {
+      "id": "s2_no_ascii_human",
+      "command": ["bash", "-c", "python3 scripts/image_sense.py --make-test-png /tmp/is_test2.png >/dev/null && python3 scripts/image_sense.py /tmp/is_test2.png --no-ascii | grep -q '格式'"]
+    },
+    {
+      "id": "s3_unknown_format_exit3",
+      "command": ["bash", "-c", "printf 'notanimage' > /tmp/is_bad.bin; python3 scripts/image_sense.py /tmp/is_bad.bin >/dev/null 2>&1; [ $? -eq 3 ]"]
+    }
+  ]
+}

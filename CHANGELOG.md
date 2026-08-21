@@ -3,6 +3,18 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.12.0] - 2026-08-21
+
+### 新增
+- 第八个技能包 **`image-sense`（无模型图像感知）**：在**完全不依赖任何模型**的前提下"看图"，接无识图能力 API 时可用
+  - 源码 `skills/image-sense/`，压缩包 `packages/image-sense.zip`
+  - 纯 Python 标准库、零依赖、离线、确定性（用户要求"只保留无模型路径"，已剔除 VLM/Pillow 等一切其他方案）
+  - `scripts/image_sense.py` 单入口：PNG 像素级全解析（zlib 解压 + None/Sub/Up/Average/Paeth 逆滤波，位深 1/2/4/8/16、色型 gray/rgb/palette/gray+alpha/rgba）、BMP(BI_RGB 8/24/32)、PPM(P3/P6)、JPEG 头部+EXIF+DQT 近似质量、GIF 尺寸/帧数/透明标志；EXIF TIFF IFD0+GPS 解析（相机/时间/软件/ISO/经纬度）；特征统计（主色/明暗/饱和度/细节/透明占比）+ dHash 感知哈希 + ASCII 预览；`--json` 结构化输出、`--make-test-png` 自测
+  - 诚实边界：只给可从像素/字节算出的确定性事实，明确拒绝回答"这是什么/什么情绪"等语义问题（无模型就说不懂），未知格式退出码 3
+  - references 一文档：`image-understanding-zh.md`（可行性结论：感知层可无模型、语义层不可；能力表/边界/接线说明 + 来源方向）
+  - evals 24 用例（触发 5 正 + 2 反 + 质量 14 + 冒烟 3）全通过
+- 仓库 evals 用例数由 120 增至 144，全部通过；`validate_skills.py` 对 image-sense 校验 0 错误 0 警告
+
 ## [0.11.0] - 2026-08-21
 
 ### 变更
