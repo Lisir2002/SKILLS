@@ -27,19 +27,24 @@ python3 scripts/image_sense.py --make-test-png t.png
 
 | 能力 | 说明 | 覆盖格式 |
 |------|------|----------|
-| 格式/尺寸/色深/色型/透明度 | 头部解析 | PNG/JPEG/BMP/PPM/GIF |
-| 像素级还原 | PNG 全格式（含调色板/透明/1~16 位深）、BMP(BI_RGB 8/24/32)、PPM | PNG/BMP/PPM |
+| 格式/尺寸/色深/色型/透明度 | 头部解析 | PNG/JPEG/BMP/PPM/GIF/WebP |
+| 像素级还原 | PNG 全格式（含调色板/透明/1~16 位深）、BMP(BI_RGB 8/24/32)、PPM；WebP/JPEG 在装有 Pillow 时自动解码（仅解码，非模型） | PNG/BMP/PPM + 可选 |
 | 主色/明暗/饱和度/细节度 | 降采样统计 | 有像素的格式 |
 | 感知哈希 dHash | 相似图检索 | 有像素的格式 |
 | ASCII 预览 | 亮度→字符画 | 有像素的格式 |
-| EXIF 元数据 | 相机/时间/软件/ISO/GPS | PNG/JPEG |
+| EXIF 元数据 | 相机/时间/软件/ISO/GPS | PNG/JPEG/WebP |
 | JPEG 头部+近似质量 | SOF 尺寸 + DQT 量化表 | JPEG |
+| WebP 头部 | VP8 有损/VP8L 无损尺寸、动画帧数、EXIF、透明标志 | WebP |
 | GIF 帧数/透明标志 | 不跑 LZW | GIF |
+
+> Pillow 仅为可选的**位图解码库**（不是模型）：装了它，WebP/JPEG 也能出像素特征；
+> 没装就如实降级为头部+EXIF，绝不假装。
 
 ## 诚实边界
 
 - **不回答语义**："这是什么场景/情绪"超出无模型能力，如实说明，禁止编造；
-- **JPEG 不做像素还原**（纯标准库解码需 Huffman+IDCT，量级过大）；给头部+EXIF+近似质量；
+- **JPEG/WebP 不做像素级位流解码**（纯标准库解码需 Huffman+IDCT/VP8 完整解码器，
+  量级过大）；依赖可选 Pillow 解码，或给头部+EXIF+近似质量；
 - 无法解析则降级输出 `pixel_error`；未知格式退出码 3。
 
 ## 目录

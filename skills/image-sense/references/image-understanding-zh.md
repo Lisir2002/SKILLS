@@ -31,22 +31,28 @@ LBP/GLCM/Gabor 纹理、直方图/主色、轮廓、模板匹配、分水岭、�
 
 | 能力 | 实现原理 | 覆盖格式 |
 |------|----------|----------|
-| 格式 / 尺寸 / 色深 / 色型 / 透明度 | 解析文件头与 chunk | PNG/JPEG/BMP/PPM/GIF |
+| 格式 / 尺寸 / 色深 / 色型 / 透明度 | 解析文件头与 chunk | PNG/JPEG/BMP/PPM/GIF/WebP |
 | **像素级还原** | PNG：zlib 解压 + 逆滤波（None/Sub/Up/Average/Paeth），位深 1/2/4/8/16、色型 gray/rgb/palette/gray+alpha/rgba 全支持；BMP：BI_RGB 8/24/32；PPM：P3/P6 | PNG/BMP/PPM |
 | **主色 / 明暗 / 饱和度 / 细节度** | 降采样后：RGB 量化桶统计、亮度均值、max-min 饱和度、相邻亮度差占比 | 有像素的格式 |
 | **感知哈希 dHash** | 9×8 灰度相邻比较 → 64 位十六进制，用于相似图检索 | 有像素的格式 |
 | **ASCII 预览** | 亮度映射成字符画，人眼直接看"这图长啥样" | 有像素的格式 |
-| EXIF 元数据（相机/时间/GPS/软件） | 解析 TIFF IFD0 + GPS IFD（JPEG APP1 / PNG eXIf） | PNG/JPEG |
+| EXIF 元数据（相机/时间/GPS/软件） | 解析 TIFF IFD0 + GPS IFD（JPEG APP1 / PNG eXIf / WebP EXIF chunk） | PNG/JPEG/WebP |
 | JPEG 头部信息 + 近似质量 | SOF 尺寸 + DQT 量化表均值估算 | JPEG |
+| WebP 头部信息 | RIFF 容器 + VP8X 画布/标志 + VP8 有损尺寸（兼容 CDN 变体）+ VP8L 无损尺寸 + 动画帧 + EXIF | WebP |
 | GIF 帧数 / 透明标志 | 图像描述符计数 + 图形控制扩展（不跑 LZW） | GIF |
+
+> 可选解码器：WebP/JPEG 的像素级解码需完整位流解码器（VP8/Huffman+IDCT），纯标准库量级
+> 过大；若环境装了 Pillow，脚本会用它**只做位图解码**（Pillow 是解码库，不是模型），
+> 之后的特征/哈希/预览仍是无模型算法。没装 Pillow 就如实降级，不假装。
 
 ## 三、诚实边界（不许幻想）
 
 1. **不做语义**：本脚本永远不说"这是一张猫的照片"。它只说"主色 #XXXXXX、
    占比 X%、细节度中、有透明通道"。语义问题回答"需要模型"。
-2. **JPEG 不做像素还原**：纯标准库解码 JPEG 需要完整 Huffman+IDCT，量级是
-   现有代码数十倍，超出"零依赖、可维护"目标。JPEG 只给头部 + EXIF + 近似质量。
-   若未来必须看 JPEG 像素，正确做法是引入 Pillow（仍是工具不是模型）或换 BMP/PNG。
+2. **JPEG/WebP 不靠纯标准库做像素还原**：解码 JPEG 需完整 Huffman+IDCT、WebP 需完整
+   VP8 位流解码器，量级是现有代码数十倍，超出"零依赖、可维护"目标。JPEG 只给头部+EXIF+
+   近似质量；WebP 给头部+尺寸+EXIF。需要像素特征时，正确做法是装 Pillow（仍是解码库不是
+   模型），脚本会自动用它解码后继续做无模型特征分析。
 3. **不确定就报错**：任何一步解析失败都会降级（给头部信息 + pixel_error），
    绝不填充猜测值。`UNKNOWN` 格式返回退出码 3，方便上层识别"看不懂"。
 

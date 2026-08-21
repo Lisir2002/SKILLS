@@ -58,7 +58,10 @@
     { "id": "q11_script_exif", "kind": "contains", "target": "scripts/image_sense.py", "text": "GPS" },
     { "id": "q12_ref_semantics", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "语义" },
     { "id": "q13_ref_paeth", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "Paeth" },
-    { "id": "q14_ref_dqt", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "DQT" }
+    { "id": "q14_ref_dqt", "kind": "contains", "target": "references/image-understanding-zh.md", "text": "DQT" },
+    { "id": "q15_webp_codec", "kind": "contains", "target": "scripts/image_sense.py", "text": "VP8 有损" },
+    { "id": "q16_pillow_optional", "kind": "contains", "target": "scripts/image_sense.py", "text": "Pillow" },
+    { "id": "q17_webp_doc", "kind": "contains", "target": "SKILL.md", "text": "WebP" }
   ],
   "smoke_tests": [
     {
@@ -72,6 +75,10 @@
     {
       "id": "s3_unknown_format_exit3",
       "command": ["bash", "-c", "printf 'notanimage' > /tmp/is_bad.bin; python3 scripts/image_sense.py /tmp/is_bad.bin >/dev/null 2>&1; [ $? -eq 3 ]"]
+    },
+    {
+      "id": "s4_webp_optional_pillow",
+      "command": ["bash", "-c", "if python3 -c 'import PIL' 2>/dev/null; then python3 -c \"from PIL import Image; Image.new('RGB',(32,16),(255,255,255)).save('/tmp/is_test.webp')\" && python3 scripts/image_sense.py /tmp/is_test.webp --json | grep -q 'VP8'; else echo 'skip:no-pillow'; fi"]
     }
   ]
 }

@@ -3,6 +3,19 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
+## [0.13.0] - 2026-08-21
+
+### 变更
+- **image-sense 扩展：新增 WebP 支持 + 可选 Pillow 位图解码**（仍是无模型路径）
+  - 用真实 WebP URL 实测修复：`scripts/image_sense.py` 新增 WebP（RIFF 容器）解析——
+    VP8X 画布/标志、VP8 有损尺寸（兼容常见编码器/CDN 的"start code 后直接跟尺寸"变体，
+    实测 doubao CDN 图 1080x2400 正确读出）、VP8L 无损尺寸、动画帧数、EXIF chunk
+  - 可选解码器：WebP/JPEG 等纯标准库无法像素级还原的格式，若环境装有 Pillow（仅解码库，
+    非模型）自动解码出像素 → 主色/明暗/哈希/ASCII 预览全部可得；未装则如实降级
+  - 修复 Pillow 12 `getdata` 弃用告警 → 改用 `get_flattened_data`（兼容旧版回退 getdata）
+  - SKILL.md / README / references 同步更新（WebP 能力、Pillow 可选说明、失败模式表）
+  - evals 用例由 24 增至 28（新增质量 3 + WebP 冒烟 1）；仓库 evals 总数 144→148 全通过
+
 ## [0.12.0] - 2026-08-21
 
 ### 新增

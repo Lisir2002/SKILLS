@@ -39,7 +39,12 @@ python3 scripts/image_sense.py --make-test-png out.png  # 生成自测 PNG（冒
 ```
 
 支持格式：**PNG**（像素级全解析，含调色板/透明/1~16 位深）、**BMP**（BI_RGB 8/24/32）、
-**PPM**（P3/P6）、**JPEG**（头部+EXIF+近似质量，像素级不解析）、**GIF**（尺寸/帧数/透明标志）。
+**PPM**（P3/P6）、**WebP**（VP8 有损/VP8L 无损头部+尺寸+动画帧+EXIF，像素级需 Pillow）、
+**JPEG**（头部+EXIF+近似质量，像素级需 Pillow）、**GIF**（尺寸/帧数/透明标志）。
+
+> 可选解码器（**不是模型**）：若环境装了 Pillow，WebP/JPEG 等纯标准库无法还原像素的格式
+> 会自动用 Pillow 只做"位图解码"，随后所有特征/哈希/预览仍由本脚本的无模型算法计算；
+> 未装 Pillow 则如实降级（给头部+EXIF，无像素特征），绝不假装。
 
 输出哪些事实：
 - `format / width / height / bit_depth / color_type / has_alpha / file_size_kb`
@@ -59,9 +64,10 @@ python3 scripts/image_sense.py --make-test-png out.png  # 生成自测 PNG（冒
 
 | 症状 | 含义 | 处置 |
 |------|------|------|
-| `format: UNKNOWN`（退出码 3） | 不支持或损坏的格式 | 告知用户支持 PNG/JPEG/BMP/PPM/GIF；损坏文件无法读 |
+| `format: UNKNOWN`（退出码 3） | 不支持或损坏的格式 | 告知用户支持 PNG/JPEG/BMP/PPM/GIF/WebP；损坏文件无法读 |
 | `pixel_error` | 头部可读但像素无法还原（如 JPEG 无像素级、BMP 非 BI_RGB） | 仍给头部+EXIF；像素类特征（主色/哈希/预览）不输出 |
 | `exif: {}` | 图片无元数据（截图/转发常见） | 如实说"无 EXIF"，不编造拍摄时间/相机 |
+| 无像素特征（`pixel_error`） | 格式需解码器但环境未装 Pillow（WebP/JPEG）或格式特殊 | 给头部+EXIF；建议装 Pillow（仅解码库）以补像素特征 |
 | 用户要语义/OCR/人脸识别 | 超出无模型边界 | 明确拒绝并解释；OCR 需 Tesseract（外部工具，非零依赖） |
 
 ## Output Rules（诚实边界）

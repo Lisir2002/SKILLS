@@ -21,6 +21,9 @@
         （JPEG 像素级解码需几十倍代码量，超出"零依赖"目标，由头部/元数据给出全部可算信息）。
   - BMP / PPM：直接还原像素。
   - GIF：解析头部尺寸 + 帧数 + 透明度标志（不跑 LZW）。
+  - WebP：解析 RIFF 容器（VP8X 画布/标志 + VP8 有损尺寸 + VP8L 无损尺寸 + 动画帧 + EXIF）；
+        像素级解码需完整位流解码器，若环境装了 Pillow 则自动用其解码像素（Pillow 仅作
+        位图解码库，不含任何模型），否则像素类特征不输出。
   - EXIF：解析 TIFF IFD0 + GPS IFD。
 
 用法：
@@ -586,6 +589,84 @@ def ascii_preview(pix, w, h, cols=64, rows=16):
     return out
 
 
+# ---------------------------------------------------------------- WebP
+
+_WEBP_MAGIC = b"RIFF"
+
+
+def _vp8_dims(payload):
+    """从 VP8 有损位流取 (宽,高)，兼容两种布局：
+    1) RFC 布局：负载以 start code(9d 01 2a) 开头 → frame tag(3) → key header(5)；
+    2) 常见编码器/CDN 变体：负载前部含 start code，其后**直接**跟 14 位宽/高。
+    返回 None 表示无法解析。"""
+    if payload[:3] == b"\x9d\x01\x2a" and len(payload) >= 11 and (payload[3] & 0x01) == 0:
+        w = payload[6] | ((payload[7] & 0x3F) << 8)
+        h = payload[8] | ((payload[9] & 0x3F) << 8)
+        if 0 < w <= 16383 and 0 < h <= 16383:
+            return w, h
+    idx = payload.find(b"\x9d\x01\x2a", 0, 32)
+    if idx >= 0 and len(payload) >= idx + 7:
+        w = payload[idx + 3] | ((payload[idx + 4] & 0x3F) << 8)
+        h = payload[idx + 5] | ((payload[idx + 6] & 0x3F) << 8)
+        if 0 < w <= 16383 and 0 < h <= 16383:
+            return w, h
+    return None, None
+
+
+def parse_webp(data):
+    """WebP（RIFF 容器）：VP8X 画布/标志 + VP8 有损尺寸 + VP8L 无损尺寸 + 动画帧 + EXIF。"""
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+        raise ValueError("不是 WebP")
+    info = {
+        "format": "WebP", "width": None, "height": None, "bit_depth": 8,
+        "color_type_name": "", "has_alpha": False, "exif": {}, "pixels": None,
+    }
+    pos, frames, codec = 12, 0, None
+    has_vp8x = False
+    while pos + 8 <= len(data):
+        cid = data[pos:pos + 4]
+        size = struct.unpack("<I", data[pos + 4:pos + 8])[0]
+        payload = data[pos + 8:pos + 8 + size]
+        if cid == b"VP8X":
+            has_vp8x = True
+            flags = payload[0] if payload else 0
+            info["has_iccp"] = bool(flags & 0x01)
+            info["has_alpha"] = info["has_alpha"] or bool(flags & 0x02)
+            info["has_exif"] = bool(flags & 0x04)
+            info["has_xmp"] = bool(flags & 0x08)
+            info["has_animation"] = bool(flags & 0x10)
+            if len(payload) >= 10:
+                info["width"] = 1 + (payload[4] | (payload[5] << 8) | (payload[6] << 16))
+                info["height"] = 1 + (payload[7] | (payload[8] << 8) | (payload[9] << 16))
+        elif cid == b"VP8 ":
+            codec = "VP8 有损"
+            w, h = _vp8_dims(payload)
+            info["width"] = info["width"] or w
+            info["height"] = info["height"] or h
+        elif cid == b"VP8L":
+            codec = "VP8L 无损"
+            if len(payload) >= 5 and payload[0] == 0x2F:
+                b = payload[1:5]
+                info["width"] = info["width"] or (b[0] | (b[1] << 8) | ((b[2] & 0x3F) << 16)) + 1
+                info["height"] = info["height"] or ((b[2] >> 6) | (b[3] << 2)) + 1
+        elif cid == b"ALPH":
+            info["has_alpha"] = True
+        elif cid == b"ANMF":
+            frames += 1
+        elif cid == b"EXIF" and payload:
+            info["exif"] = parse_exif(payload) or {}
+        pos += 8 + size + (size & 1)  # RIFF chunk 按偶数字节对齐
+    info["codec"] = codec
+    if codec:
+        info["color_type_name"] = codec + ("（VP8X 扩展）" if has_vp8x else "")
+    if info.get("has_animation"):
+        info["frames"] = max(frames, 1)
+    if info["width"] and info["height"]:
+        info["pixel_error"] = ("%s 像素级解码需完整位流解码器；已安装 Pillow 时自动用其解码"
+                               % (codec or "WebP"))
+    return info
+
+
 # ---------------------------------------------------------------- 主流程
 
 def detect(data):
@@ -599,7 +680,9 @@ def detect(data):
         return parse_ppm(data)
     if data[:6] in (b"GIF87a", b"GIF89a"):
         return parse_gif(data)
-    return {"format": "UNKNOWN", "error": "无法识别的图片格式（支持 PNG/JPEG/BMP/PPM/GIF）"}
+    if data[:4] == _WEBP_MAGIC and data[8:12] == b"WEBP":
+        return parse_webp(data)
+    return {"format": "UNKNOWN", "error": "无法识别的图片格式（支持 PNG/JPEG/BMP/PPM/GIF/WebP）"}
 
 
 def make_test_png(path, w=64, h=32):
@@ -643,6 +726,8 @@ def render(info, show_ascii=True):
         lines.append(f"位深/色型 : {info.get('bit_depth')} bit / {info.get('color_type_name')}")
     if info.get("frames"):
         lines.append(f"帧数      : {info.get('frames')}")
+    if info.get("decoded_by"):
+        lines.append(f"解码      : {info.get('decoded_by')}")
     if info.get("has_transparency_flag") is not None:
         lines.append(f"透明标志  : {'有' if info.get('has_transparency_flag') else '无'}")
     if info.get("quality_approx"):
@@ -707,6 +792,29 @@ def main(argv):
     if info.get("format") == "UNKNOWN":
         print(render(info))
         return 3
+    # 可选解码器（Pillow 仅作位图解码库，非模型）：对纯标准库无法还原像素的格式
+    # （如 WebP/JPEG），若环境装了 Pillow 则用它解码出像素，供特征/哈希/预览分析。
+    if info.get("pixels") is None and info.get("width"):
+        try:
+            from PIL import Image
+        except Exception:
+            Image = None
+        if Image is not None and args.path:
+            try:
+                with Image.open(args.path) as im:
+                    im = im.convert("RGBA")
+                    w, h = im.size
+                    if hasattr(im, "get_flattened_data"):
+                        px = list(im.get_flattened_data())
+                    else:
+                        px = list(im.getdata())
+                    if len(px) == w * h:
+                        info["pixels"] = px
+                        info["width"], info["height"] = w, h
+                        info["decoded_by"] = "pillow(仅解码,无模型)"
+                        info.pop("pixel_error", None)
+            except Exception as exc:
+                info["pixel_error"] = f"Pillow 解码失败: {exc}"
     info["file_size"] = len(data)
     info["file_size_kb"] = round(len(data) / 1024, 1)
     feats = analyze_pixels(info.get("pixels"), info.get("width") or 0, info.get("height") or 0)
