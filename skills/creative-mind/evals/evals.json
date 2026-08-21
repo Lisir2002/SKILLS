@@ -1,0 +1,61 @@
+{
+  "skill_name": "creative-mind",
+  "trigger_evals": [
+    {
+      "id": "t1_new_ideas",
+      "prompt": "帮我想几个有创意的营销点子",
+      "must_trigger": true,
+      "keywords": ["创意", "点子", "创新"]
+    },
+    {
+      "id": "t2_break_pattern",
+      "prompt": "这个方案太套路了，跳出思维定式重新想",
+      "must_trigger": true,
+      "keywords": ["跳出思维定式", "套路", "重新想"]
+    },
+    {
+      "id": "t3_no_template",
+      "prompt": "别模板化，给我点不一样的灵感",
+      "must_trigger": true,
+      "keywords": ["模板化", "灵感", "不一样"]
+    },
+    {
+      "id": "t4_original",
+      "prompt": "我要原创一点的想法，不要千篇一律的",
+      "must_trigger": true,
+      "keywords": ["原创", "千篇一律"]
+    },
+    {
+      "id": "t5_negative_parse",
+      "prompt": "帮我解析这个抖音链接",
+      "must_trigger": false,
+      "keywords": ["创新", "点子", "创意", "脑洞", "跳出思维定式", "灵感"]
+    }
+  ],
+  "quality_evals": [
+    { "id": "q1_structure", "kind": "contains", "target": "SKILL.md", "text": "## When NOT to Use" },
+    { "id": "q2_four_steps", "kind": "contains", "target": "SKILL.md", "text": "Step 1 · 破固化" },
+    { "id": "q3_tech_ref", "kind": "contains", "target": "SKILL.md", "text": "techniques-zh.md" },
+    { "id": "q4_script_ref", "kind": "contains", "target": "SKILL.md", "text": "stereotype_scan.py" },
+    { "id": "q5_script_ref2", "kind": "contains", "target": "SKILL.md", "text": "idea_scaffold.py" },
+    { "id": "q6_readme_install", "kind": "contains", "target": "README.md", "text": "安装" },
+    { "id": "q7_no_secret", "kind": "not_contains", "target": "SKILL.md", "text": "ghp_" },
+    { "id": "q8_no_secret2", "kind": "not_contains", "target": "SKILL.md", "text": "sk_test_" },
+    { "id": "q9_scaffold_cli", "kind": "contains", "target": "scripts/idea_scaffold.py", "text": "--topic" },
+    { "id": "q10_scan_cli", "kind": "contains", "target": "scripts/stereotype_scan.py", "text": "--text" }
+  ],
+  "smoke_tests": [
+    {
+      "id": "s1_scaffold",
+      "command": ["python3", "scripts/idea_scaffold.py", "--topic", "智能水杯卖点", "--techniques", "cross_domain,reversal", "--seed", "1", "--json"]
+    },
+    {
+      "id": "s2_scan_low",
+      "command": ["python3", "scripts/stereotype_scan.py", "--text", "把下单按钮从三次点击减到一次，并显示等待时长。", "--json"]
+    },
+    {
+      "id": "s3_scan_high",
+      "command": ["python3", "scripts/stereotype_scan.py", "--text", "综上所述，我们要极大地赋能业务，全面升级用户体验，点亮梦想。", "--json"]
+    }
+  ]
+}

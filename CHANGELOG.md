@@ -3,7 +3,19 @@
 本文件记录仓库与各技能包的变更历史。
 遵循 Keep a Changelog 约定（新增/变更/弃用/移除/修复/安全）。
 
-## [0.7.0] - 2026-08-20
+## [0.8.0] - 2026-08-21
+
+### 新增
+- 第六个技能包 **`creative-mind`（通用创新引擎）**：让模型基于自身知识储备造出属于自己的新东西，破解"AI 输出千篇一律、固化思想"问题
+  - 源码 `skills/creative-mind/`，压缩包 `packages/creative-mind.zip`
+  - 核心依据"模式坍缩"研究：LLM 默认输出概率最高/最安全/最套路的答案（典型性偏见所致），破解口诀"先列候选池再选择"（口述采样 Verbalized Sampling）
+  - 四步引擎：破固化 Detach（先说出典型答案并禁用）→ 发散 Diverge（12+ 技法产出 ≥3 个角度不同候选）→ 收敛 Converge（跨候选杂交 + 新颖/可行/价值三维筛选 + 命名）→ 验新 Verify（red-team 自批判 + 固化度机械检测）
+  - 两脚本纯标准库离线：`idea_scaffold.py` 发散脚手架（SCAMPER/跨域融合/反事实/第一性原理/反转/极端化/类比/随机刺激/口述采样，9 技法随机种子可复现）、`stereotype_scan.py` 固化度检测（负面词库 + 结构模式 → 0-100 评分，`--fail-on-high` 供 CI）
+  - references 三文档：`creative-workflow-zh.md` 原理（模式坍缩为什么发生）、`techniques-zh.md` 技法库（13 技法+示例）、`anti-cliche-zh.md` AI 套路负面清单
+  - evals 18 用例（触发 5 + 质量 10 + 冒烟 3）全通过
+- 仓库 evals 用例数由 60 增至 78，全部通过；`validate_skills.py` 对 creative-mind 校验 0 错误 0 警告
+
+
 
 ### 新增
 - 第五个技能包 **`visualization`（可视化）**：把"画个图"需求落地为图谱 / 图表 / 表格 / 可视化报告
